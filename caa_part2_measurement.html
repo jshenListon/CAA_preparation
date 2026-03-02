@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAA Numeracy: Measurement & Geometry</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+            --bg: #f4f6f7;
+            --card-bg: #ffffff;
+            --calc-color: #8e44ad;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--primary); padding: 20px; max-width: 900px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary); margin: 0; }
+        .header p { color: #7f8c8d; }
+        
+        .calc-badge {
+            background: var(--calc-color); color: white; padding: 5px 12px; border-radius: 20px; 
+            font-size: 0.9rem; font-weight: bold; display: inline-block; margin-top: 5px;
+        }
+
+        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s; }
+
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: none; animation: fadeIn 0.5s; }
+        .card.active { display: block; }
+
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+        .context-box { background: #eaf2f8; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 15px; font-style: italic; }
+
+        input[type="number"], input[type="text"] { padding: 10px; font-size: 1rem; border: 2px solid #bdc3c7; border-radius: 6px; width: 140px; }
+        button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .feedback { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; }
+        
+        .solution-box {
+            display: none; margin-top: 15px; background: #fff3e0; border: 1px solid #d35400; 
+            padding: 15px; border-radius: 8px; color: #d35400;
+        }
+        .calc-steps { font-family: monospace; background: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; display: inline-block; margin-top: 5px; }
+        .key { border: 1px solid #999; padding: 2px 6px; border-radius: 4px; background: #eee; box-shadow: 0 2px 0 #999; font-size: 0.9em; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        
+        .hw-item { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .hw-item:last-child { border-bottom: none; }
+        .hw-label { font-weight:bold; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px; display:block; }
+
+        .report-card { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-top: 30px; border: 4px solid #f1c40f; display:none; }
+        .report-title { text-align: center; border-bottom: 1px solid #7f8c8d; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; font-weight: bold; }
+        .skill-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .skill-name { font-weight: bold; }
+        .final-score { text-align: center; font-size: 2rem; margin: 20px 0; font-weight: bold; color: #f1c40f; }
+        .teacher-note { font-style: italic; text-align: center; font-size: 0.9rem; color: #bdc3c7; margin-top: 10px; }
+
+        /* SVG Styles - WIDENED for Visibility */
+        .diagram-container { text-align: center; margin: 15px 0; background: #fff; border: 1px dashed #ccc; padding: 10px; border-radius: 8px; overflow: hidden; }
+        svg text { font-size: 14px; font-weight: bold; fill: #333; }
+        svg path, svg rect, svg circle, svg polygon { fill: #e8f6f3; stroke: #2c3e50; stroke-width: 2; }
+        
+        /* Timetable Table */
+        .time-table { width: 100%; border-collapse: collapse; margin-top:10px; font-size: 0.9rem; }
+        .time-table th { background: #2c3e50; color: white; padding: 8px; border: 1px solid #999; }
+        .time-table td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        .time-table tr:nth-child(even) { background: #f9f9f9; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CAA Numeracy Prep</h1>
+    <p>Part 2: Measurement & Geometry</p>
+    <div class="calc-badge">🖩 Calculator Allowed</div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="card active" id="card-0">
+    <h2>📏 Welcome to Measurement</h2>
+    <p>This module covers key skills:</p>
+    <ul>
+        <li><strong>Conversions:</strong> Length, Time, Capacity (Both ways).</li>
+        <li><strong>Shapes:</strong> Perimeter, Area (Rect, Tri, Para, Trap, Circle).</li>
+        <li><strong>3D:</strong> Volume (Prism, Cylinder).</li>
+        <li><strong>Real World:</strong> Speed & Timetables.</li>
+    </ul>
+    <div style="text-align:center;">
+        <button onclick="nextCard(1)">Start Training</button>
+    </div>
+</div>
+
+<div class="card" id="card-1">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#f1c40f; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">1. Length</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">1 cm = 10 mm</span>
+    </div>
+    <div class="question-text">Convert both ways</div>
+    
+    <p><strong>A:</strong> A card is <strong>8 mm</strong> thick. Convert to <strong>cm</strong>.</p>
+    <input type="number" id="ans-1a" placeholder="cm">
+    <button onclick="checkAnswer(1, 0.8, 'a')">Check</button>
+    <div class="feedback" id="fb-1a"></div>
+    <div class="solution-box" id="sol-1a">
+        <strong>Solution:</strong><br>
+        Why? Because 1 cm = 10 mm. Going from small (mm) to big (cm) means we DIVIDE.<br>
+        $8 \div 10 = 0.8$ cm.
+    </div>
+    
+    <div id="part-b-1" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <p><strong>B:</strong> A phone is <strong>14.5 cm</strong> tall. Convert to <strong>mm</strong>.</p>
+        <input type="number" id="ans-1b" placeholder="mm">
+        <button onclick="checkAnswer(1, 145, 'b')">Check</button>
+        <div class="feedback" id="fb-1b"></div>
+        <div class="solution-box" id="sol-1b">
+            <strong>Solution:</strong><br>
+            Why? Because 1 cm = 10 mm. Going from big (cm) to small (mm) means we MULTIPLY.<br>
+            $14.5 \times 10 = 145$ mm.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-2">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e67e22; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">2. Time</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">1 hr = 60 mins</span>
+    </div>
+    <div class="question-text">Decimal Hours & Minutes</div>
+    
+    <p><strong>A:</strong> A movie is <strong>1.5 hours</strong>. How many <strong>minutes</strong>?</p>
+    <input type="number" id="ans-2a" placeholder="mins">
+    <button onclick="checkAnswer(2, 90, 'a')">Check</button>
+    <div class="feedback" id="fb-2a"></div>
+    <div class="solution-box" id="sol-2a">
+        <strong>Solution:</strong><br>
+        Why? Because 1 hour has 60 minutes.<br>
+        $1.5 \times 60 = 90$ mins.
+    </div>
+
+    <div id="part-b-2" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <p><strong>B:</strong> A exam is <strong>150 minutes</strong>. How many <strong>hours</strong>?</p>
+        <input type="number" id="ans-2b" placeholder="hours">
+        <button onclick="checkAnswer(2, 2.5, 'b')">Check</button>
+        <div class="feedback" id="fb-2b"></div>
+        <div class="solution-box" id="sol-2b">
+            <strong>Solution:</strong><br>
+            Why? To get hours, we see how many 60s fit into 150.<br>
+            $150 \div 60 = 2.5$ hours.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-3">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#3498db; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">3. Capacity</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">1 L = 1000 mL</span>
+    </div>
+    <div class="question-text">Litres & Millilitres</div>
+    
+    <p><strong>A:</strong> A bottle holds <strong>2500 mL</strong>. Convert to <strong>Litres</strong>.</p>
+    <input type="number" id="ans-3a" placeholder="L">
+    <button onclick="checkAnswer(3, 2.5, 'a')">Check</button>
+    <div class="feedback" id="fb-3a"></div>
+    <div class="solution-box" id="sol-3a">
+        <strong>Solution:</strong><br>
+        Why? Because 1 Litre is 1000 mL. We divide by 1000.<br>
+        $2500 \div 1000 = 2.5$ L.
+    </div>
+
+    <div id="part-b-3" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <p><strong>B:</strong> A bucket holds <strong>3.2 Litres</strong>. Convert to <strong>mL</strong>.</p>
+        <input type="number" id="ans-3b" placeholder="mL">
+        <button onclick="checkAnswer(3, 3200, 'b')">Check</button>
+        <div class="feedback" id="fb-3b"></div>
+        <div class="solution-box" id="sol-3b">
+            <strong>Solution:</strong><br>
+            Why? Multiply by 1000 to get mL.<br>
+            $3.2 \times 1000 = 3200$ mL.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-4">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#9b59b6; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">4. Perimeter</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Add all sides</span>
+    </div>
+    <div class="question-text">Distance Around Outside</div>
+    <div class="diagram-container">
+        <svg width="280" height="120">
+            <rect x="20" y="20" width="160" height="80" />
+            <text x="90" y="15">14 cm</text>
+            <text x="190" y="65">5 cm</text>
+        </svg>
+    </div>
+    <p>Calculate the <strong>Perimeter</strong> of this card.</p>
+    <input type="number" id="ans-4" placeholder="cm">
+    <button onclick="checkAnswer(4, 38)">Check</button>
+    <div class="feedback" id="fb-4"></div>
+    <div class="solution-box" id="sol-4">
+        <strong>Solution:</strong><br>
+        Why? Perimeter is the total distance around the outside. A rectangle has 4 sides.<br>
+        $14 + 14 + 5 + 5 = 38$ cm.
+    </div>
+</div>
+
+<div class="card" id="card-5">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#2ecc71; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">5. Triangles & Parallelograms</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Area Formulas</span>
+    </div>
+    
+    <div class="question-text">A: Triangle (0.5 × b × h)</div>
+    <div class="diagram-container">
+        <svg width="280" height="130" viewBox="0 0 280 130">
+            <polygon points="60,90 220,90 140,10" />
+            <line x1="140" y1="10" x2="140" y2="90" stroke="red" stroke-dasharray="4"/>
+            <text x="145" y="60" fill="red">h = 8m</text>
+            <line x1="60" y1="105" x2="220" y2="105" stroke="#333" stroke-width="1"/> 
+            <line x1="60" y1="100" x2="60" y2="110" stroke="#333" stroke-width="1"/>
+            <line x1="220" y1="100" x2="220" y2="110" stroke="#333" stroke-width="1"/>
+            <text x="140" y="120" text-anchor="middle">Base = 12m</text>
+        </svg>
+    </div>
+    <p>Calculate Area:</p>
+    <input type="number" id="ans-5a" placeholder="m²">
+    <button onclick="checkAnswer(5, 48, 'a')">Check</button>
+    <div class="feedback" id="fb-5a"></div>
+    <div class="solution-box" id="sol-5a">
+        <strong>Solution:</strong><br>
+        Why? A triangle is half of a rectangle.<br>
+        $0.5 \times 12 \times 8 = 48$ m².
+    </div>
+
+    <div id="part-b-5" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <div class="question-text">B: Parallelogram (b × h)</div>
+        <div class="diagram-container">
+            <svg width="280" height="130" viewBox="0 0 280 130">
+                <polygon points="40,90 200,90 170,20 10,20" />
+                <line x1="40" y1="20" x2="40" y2="90" stroke="red" stroke-dasharray="4"/>
+                <text x="45" y="60" fill="red">h = 7m</text>
+                <line x1="40" y1="105" x2="200" y2="105" stroke="#333" stroke-width="1"/>
+                <line x1="40" y1="100" x2="40" y2="110" stroke="#333" stroke-width="1"/>
+                <line x1="200" y1="100" x2="200" y2="110" stroke="#333" stroke-width="1"/>
+                <text x="120" y="120" text-anchor="middle">Base = 15m</text>
+            </svg>
+        </div>
+        <p>Calculate Area:</p>
+        <input type="number" id="ans-5b" placeholder="m²">
+        <button onclick="checkAnswer(5, 105, 'b')">Check</button>
+        <div class="feedback" id="fb-5b"></div>
+        <div class="solution-box" id="sol-5b">
+            <strong>Solution:</strong><br>
+            Why? Parallelograms use Base × Height (just like a rectangle).<br>
+            $15 \times 7 = 105$ m².
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-6">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#16a085; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">6. Advanced Area</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Formula Provided</span>
+    </div>
+    
+    <div class="question-text">A: Trapezium Area</div>
+    <div class="context-box">Formula: $\frac{a+b}{2} \times h$</div>
+    <div class="diagram-container">
+        <svg width="280" height="100" viewBox="0 0 280 100">
+            <polygon points="40,80 160,80 140,20 60,20" />
+            <text x="100" y="95" text-anchor="middle">b = 10</text>
+            <text x="100" y="15" text-anchor="middle">a = 6</text>
+            <text x="165" y="55">h = 4</text>
+            <line x1="140" y1="20" x2="140" y2="80" stroke="red" stroke-dasharray="4"/>
+        </svg>
+    </div>
+    <p>Calculate Area:</p>
+    <input type="number" id="ans-6a" placeholder="Units²">
+    <button onclick="checkAnswer(6, 32, 'a')">Check</button>
+    <div class="feedback" id="fb-6a"></div>
+    <div class="solution-box" id="sol-6a">
+        <strong>Solution:</strong><br>
+        Why? Average the parallel sides, then multiply by height.<br>
+        $\frac{6+10}{2} \times 4 = 8 \times 4 = 32$.
+    </div>
+
+    <div id="part-b-6" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <div class="question-text">B: Circle Area</div>
+        <div class="context-box">Formula: $\pi \times r^2$ (Use $\pi = 3.14$)</div>
+        <div class="diagram-container">
+            <svg width="280" height="120" viewBox="0 0 280 120">
+                <circle cx="140" cy="60" r="40" />
+                <line x1="140" y1="60" x2="180" y2="60" stroke="red" />
+                <text x="145" y="55" fill="red" font-weight="bold">r = 5cm</text>
+            </svg>
+        </div>
+        <p>Calculate Area:</p>
+        <input type="number" id="ans-6b" placeholder="cm²">
+        <button onclick="checkAnswer(6, 78.5, 'b')">Check</button>
+        <div class="feedback" id="fb-6b"></div>
+        <div class="solution-box" id="sol-6b">
+            <strong>Solution:</strong><br>
+            Why? The formula is Pi × Radius × Radius.<br>
+            $3.14 \times 5^2 = 3.14 \times 25 = 78.5$.
+        </div>
+    </div>
+    
+    <div id="part-c-6" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <div class="question-text">C: Compound Area</div>
+        <div class="diagram-container">
+            <svg width="200" height="150" viewBox="0 0 200 150">
+                <path d="M10,10 L110,10 L110,60 L60,60 L60,110 L10,110 Z" />
+                <text x="50" y="5">100</text> <text x="115" y="35">50</text> <text x="65" y="125">50</text> <text x="0" y="60">100</text> <line x1="10" y1="60" x2="60" y2="60" stroke="white" stroke-dasharray="4"/>
+            </svg>
+        </div>
+        <p>Find total area.</p>
+        <input type="number" id="ans-6c" placeholder="Units²">
+        <button onclick="checkAnswer(6, 7500, 'c')">Check</button>
+        <div class="feedback" id="fb-6c"></div>
+        <div class="solution-box" id="sol-6c">
+            <strong>Solution:</strong><br>
+            Why? Split the shape into two rectangles.<br>
+            Top Rectangle: $100 \times 50 = 5000$.<br>
+            Bottom Left: $50 \times 50 = 2500$. (Wait! The diagram implies $60,110$... Let's stick to the numbers: $100 \times 50$ and $50 \times 50$ is standard)<br>
+            Total: $5000 + 2500 = 7500$.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-7">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e74c3c; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">7. Volume</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Area × Height</span>
+    </div>
+    
+    <div class="question-text">A: Prism (Box)</div>
+    <div class="diagram-container">
+        <svg width="250" height="120">
+            <rect x="20" y="40" width="80" height="50" fill="#e8f6f3" stroke="black"/>
+            <path d="M20,40 L50,20 L130,20 L100,40 M130,20 L130,70 L100,90" fill="none" stroke="black"/>
+            <text x="50" y="105">L=8</text>
+            <text x="110" y="100">W=5</text>
+            <text x="135" y="50">H=3</text>
+        </svg>
+    </div>
+    <p>Calculate Volume (No formula given!):</p>
+    <input type="number" id="ans-7a" placeholder="Units³">
+    <button onclick="checkAnswer(7, 120, 'a')">Check</button>
+    <div class="feedback" id="fb-7a"></div>
+    <div class="solution-box" id="sol-7a">
+        <strong>Solution:</strong><br>
+        Why? Volume is Base Area × Height.<br>
+        $8 \times 5 \times 3 = 120$.
+    </div>
+
+    <div id="part-b-7" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <div class="question-text">B: Cylinder</div>
+        <div class="context-box">Formula: $\pi \times r^2 \times h$ (Use $\pi = 3.14$)</div>
+        <div class="diagram-container">
+            <svg width="200" height="140">
+                <ellipse cx="80" cy="30" rx="30" ry="10" />
+                <ellipse cx="80" cy="110" rx="30" ry="10" />
+                <line x1="50" y1="30" x2="50" y2="110" stroke="black"/>
+                <line x1="110" y1="30" x2="110" y2="110" stroke="black"/>
+                <text x="115" y="70">h=10</text>
+                
+                <line x1="80" y1="30" x2="130" y2="10" stroke="red" stroke-width="2"/>
+                <text x="135" y="15" fill="red" font-weight="bold">r=3</text>
+            </svg>
+        </div>
+        <p>Calculate Volume:</p>
+        <input type="number" id="ans-7b" placeholder="Units³">
+        <button onclick="checkAnswer(7, 282.6, 'b')">Check</button>
+        <div class="feedback" id="fb-7b"></div>
+        <div class="solution-box" id="sol-7b">
+            <strong>Solution:</strong><br>
+            Why? Area of circle base ($\pi r^2$) multiplied by height.<br>
+            $3.14 \times 3^2 \times 10 = 282.6$.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-8">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#2c3e50; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">8. Speed & Time</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Real World</span>
+    </div>
+    
+    <div class="question-text">A: Speed Calculation</div>
+    <div class="context-box">Speed = Distance $\div$ Time</div>
+    <p>A car travels <strong>120 km</strong> in <strong>1.5 hours</strong>. What is its speed?</p>
+    <input type="number" id="ans-8a" placeholder="km/h">
+    <button onclick="checkAnswer(8, 80, 'a')">Check</button>
+    <div class="feedback" id="fb-8a"></div>
+    <div class="solution-box" id="sol-8a">
+        <strong>Solution:</strong><br>
+        Why? Speed is how far you go in 1 hour.<br>
+        $120 \div 1.5 = 80$ km/h.
+    </div>
+
+    <div id="part-b-8" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <div class="question-text">B: Timetable Mastery</div>
+        <div class="context-box">
+            <strong>Full Bus Timetable</strong>
+            <table class="time-table">
+                <tr><th>Stop</th><th>Bus 1</th><th>Bus 2</th><th>Bus 3</th></tr>
+                <tr><td>Depot</td><td>08:00</td><td>09:00</td><td>10:00</td></tr>
+                <tr><td>Mall</td><td>08:15</td><td>09:15</td><td>10:15</td></tr>
+                <tr><td>School</td><td>08:40</td><td>09:40</td><td>10:40</td></tr>
+            </table>
+        </div>
+        
+        <p><strong>Q1:</strong> You catch Bus 2 at the Mall. What time do you arrive at School? (Format 0940)</p>
+        <input type="number" id="ans-8b" placeholder="Time">
+        <button onclick="checkAnswer(8, 940, 'b')">Check</button>
+        <div class="feedback" id="fb-8b"></div>
+        <div class="solution-box" id="sol-8b"><strong>Solution:</strong> Read down 'Bus 2' column to 'School' row: 09:40.</div>
+        
+        <div id="part-c-8" style="display:none; margin-top:15px; border-top:1px dashed #ccc; padding-top:15px;">
+            <p><strong>Q2:</strong> How many <strong>minutes</strong> does the trip from Depot to School take?</p>
+            <input type="number" id="ans-8c" placeholder="mins">
+            <button onclick="checkAnswer(8, 40, 'c')">Check</button>
+            <div class="feedback" id="fb-8c"></div>
+            <div class="solution-box" id="sol-8c"><strong>Solution:</strong> 08:00 to 08:40 is 40 minutes.</div>
+        </div>
+        
+        <div id="part-d-8" style="display:none; margin-top:15px; border-top:1px dashed #ccc; padding-top:15px;">
+            <p><strong>Q3:</strong> You arrive at the Depot at 08:05. How long must you wait for the next bus?</p>
+            <input type="number" id="ans-8d" placeholder="mins">
+            <button onclick="checkAnswer(8, 55, 'd')">Check</button>
+            <div class="feedback" id="fb-8d"></div>
+            <div class="solution-box" id="sol-8d"><strong>Solution:</strong> Next bus is 09:00. 08:05 to 09:00 is 55 minutes.</div>
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-9">
+    <h2>🎉 Training Complete!</h2>
+    <p>Complete this comprehensive homework set based on Past Exam Papers.</p>
+    
+    <div class="hw-item">
+        <span class="hw-label">HW Q1: Dripping Tap (Time & Capacity)</span>
+        <div class="question-text">
+            Francis noticed that his tap was dripping at a rate of 20mL per minute. He called the plumber who said he would be there in <strong>2.25 hours</strong>.
+        </div>
+        
+        <p><strong>A:</strong> How many <strong>minutes</strong> are there in 2.25 hours?</p>
+        <input type="number" id="ans-hw1" placeholder="mins">
+        <button onclick="checkAnswer('hw1', 135)">Check</button>
+        <div class="feedback" id="fb-hw1"></div>
+        <div class="solution-box" id="sol-hw1">
+            <strong>Solution:</strong> Why? 1 hour = 60 mins.<br>
+            $2.25 \times 60 = 135$ minutes.
+        </div>
+
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>B:</strong> How many <strong>Litres</strong> of water will drip out in that time?</p>
+            <input type="number" id="ans-hw1b" placeholder="Litres">
+            <button onclick="checkAnswer('hw1b', 2.7)">Check</button>
+            <div class="feedback" id="fb-hw1b"></div>
+            <div class="solution-box" id="sol-hw1b">
+                <strong>Solution:</strong><br>
+                1. Total mL: $20 \text{ mL/min} \times 135 \text{ mins} = 2700 \text{ mL}$.<br>
+                2. Convert to Litres (Divide by 1000): $2.7$ Litres.
+            </div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q2: Faye's Card (Perimeter & Area)</span>
+        <div class="question-text">
+            Faye has a rectangular card that is <strong>14 cm</strong> long and <strong>8.6 cm</strong> wide.
+        </div>
+        
+        <p><strong>A:</strong> How much tape does she need to create a border? (Perimeter)</p>
+        <input type="number" id="ans-hw2" placeholder="cm">
+        <button onclick="checkAnswer('hw2', 45.2)">Check</button>
+        <div class="feedback" id="fb-hw2"></div>
+        <div class="solution-box" id="sol-hw2">
+            <strong>Solution:</strong> Why? Add all 4 sides.<br>
+            $14 + 14 + 8.6 + 8.6 = 45.2$ cm.
+        </div>
+
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>B:</strong> Calculate the <strong>Area</strong> of the card.</p>
+            <input type="number" id="ans-hw2b" placeholder="cm²">
+            <button onclick="checkAnswer('hw2b', 120.4)">Check</button>
+            <div class="feedback" id="fb-hw2b"></div>
+            <div class="solution-box" id="sol-hw2b">
+                <strong>Solution:</strong> Why? Area = Length × Width.<br>
+                $14 \times 8.6 = 120.4$ cm².
+            </div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q3: Glitter Paper (Faye's Card)</span>
+        <div class="question-text">Faye has a sheet of paper 16 cm long and 8 cm wide.<br>
+        She cuts out a small rectangle that is <strong>4 cm</strong> by <strong>8 cm</strong>.</div>
+        <p>What is the area of the <strong>remaining</strong> piece?</p>
+        <p><em>(Hint: Total Area - Cut Area)</em></p>
+        <input type="number" id="ans-hw3" placeholder="cm²">
+        <button onclick="checkAnswer('hw3', 96)">Check</button>
+        <div class="feedback" id="fb-hw3"></div>
+        <div class="solution-box" id="sol-hw3">
+            <strong>Solution:</strong><br>
+            Why? Subtract the cut-out.<br>
+            Total: $16 \times 8 = 128$. Cut: $8 \times 4 = 32$.<br>
+            $128 - 32 = 96$ cm².
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q4: Candle Box (2024 Exam)</span>
+        <div class="question-text">
+            Zion makes a box with dimensions: Length = <strong>4.5 cm</strong>, Width = <strong>4.5 cm</strong>, Height = <strong>8 cm</strong>.
+        </div>
+        
+        <p><strong>A:</strong> Calculate the <strong>Volume</strong>.</p>
+        <input type="number" id="ans-hw4" placeholder="cm³">
+        <button onclick="checkAnswer('hw4', 162)">Check</button>
+        <div class="feedback" id="fb-hw4"></div>
+        <div class="solution-box" id="sol-hw4">
+            <strong>Solution:</strong><br>
+            Why? Volume = $L \times W \times H$.<br>
+            $4.5 \times 4.5 \times 8 = 162$ cm³.
+        </div>
+
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>B:</strong> Calculate the <strong>Surface Area</strong> (The box has a base but <strong>NO LID</strong>).</p>
+            <input type="number" id="ans-hw4b" placeholder="cm²">
+            <button onclick="checkAnswer('hw4b', 164.25)">Check</button>
+            <div class="feedback" id="fb-hw4b"></div>
+            <div class="solution-box" id="sol-hw4b">
+                <strong>Solution:</strong><br>
+                1. Base: $4.5 \times 4.5 = 20.25$.<br>
+                2. Sides (4 walls): Each is $4.5 \times 8 = 36$. Total sides = $36 \times 4 = 144$.<br>
+                3. Total: $20.25 + 144 = 164.25$ cm².
+            </div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q5: Lake Walk (2021 Exam)</span>
+        <div class="question-text">Jess walks around Lake Tikitapu. The distance is <strong>3.8 km</strong>.<br>
+        She walks at a speed of <strong>4 km/h</strong>.</div>
+        
+        <p><strong>A:</strong> How many <strong>hours</strong> (decimal) does it take?</p>
+        <input type="number" id="ans-hw5" placeholder="hours">
+        <button onclick="checkAnswer('hw5', 0.95)">Check</button>
+        <div class="feedback" id="fb-hw5"></div>
+        <div class="solution-box" id="sol-hw5">
+            <strong>Solution:</strong><br>
+            Why? Time = Distance ÷ Speed.<br>
+            $3.8 \div 4 = 0.95$ hours.
+        </div>
+
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>B:</strong> How many <strong>minutes</strong> is 0.95 hours?</p>
+            <input type="number" id="ans-hw5b" placeholder="mins">
+            <button onclick="checkAnswer('hw5b', 57)">Check</button>
+            <div class="feedback" id="fb-hw5b"></div>
+            <div class="solution-box" id="sol-hw5b">
+                <strong>Solution:</strong><br>
+                Why? Multiply decimal hours by 60.<br>
+                $0.95 \times 60 = 57$ minutes.
+            </div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q6: Complex Ferry Schedule</span>
+        <div class="context-box">
+            <strong>Full Timetable</strong>
+            <table class="time-table">
+                <tr><th>Stop</th><th>Ferry 1</th><th>Ferry 2</th><th>Ferry 3</th></tr>
+                <tr><td>Island A</td><td>09:00</td><td>11:00</td><td>13:00</td></tr>
+                <tr><td>North Wharf</td><td>09:20</td><td>11:20</td><td>13:20</td></tr>
+                <tr><td>Island B</td><td>09:45</td><td>11:45</td><td>13:45</td></tr>
+                <tr><td>Bay C</td><td>10:10</td><td>12:10</td><td>14:10</td></tr>
+                <tr><td>Mainland</td><td>10:30</td><td>12:30</td><td>14:30</td></tr>
+            </table>
+        </div>
+        
+        <p><strong>A:</strong> How long does the trip from <strong>North Wharf</strong> to <strong>Bay C</strong> take?</p>
+        <input type="number" id="ans-hw6a" placeholder="mins">
+        <button onclick="checkAnswer('hw6', 50, 'a')">Check</button>
+        <div class="feedback" id="fb-hw6a"></div>
+        <div class="solution-box" id="sol-hw6a">
+            <strong>Solution:</strong> Look at Ferry 1. 09:20 to 10:10.<br>
+            That is 50 minutes.
+        </div>
+        
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>B:</strong> You arrive at Island A at 09:05. How long must you wait for the next ferry?</p>
+            <input type="number" id="ans-hw6b" placeholder="mins">
+            <button onclick="checkAnswer('hw6', 115, 'b')">Check</button>
+            <div class="feedback" id="fb-hw6b"></div>
+            <div class="solution-box" id="sol-hw6b">
+                <strong>Solution:</strong><br>
+                You missed Ferry 1 (09:00). Next is Ferry 2 (11:00).<br>
+                09:05 to 11:00 is 1 hour 55 mins = $60 + 55 = 115$ mins.
+            </div>
+        </div>
+
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>C:</strong> If you catch Ferry 3 at Island B, what time do you arrive at the Mainland? (Format HHMM)</p>
+            <input type="number" id="ans-hw6c" placeholder="HHMM">
+            <button onclick="checkAnswer('hw6', 1430, 'c')">Check</button>
+            <div class="feedback" id="fb-hw6c"></div>
+            <div class="solution-box" id="sol-hw6c">
+                <strong>Solution:</strong> Column 'Ferry 3', Row 'Mainland' = 14:30.
+            </div>
+        </div>
+
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>D:</strong> Which Ferry must you catch from Island A to be at the Mainland before 13:00?</p>
+            <button class="btn-outline" onclick="checkAnswer('hw6', 2, 'd')">Ferry 2</button>
+            <button class="btn-outline" onclick="checkAnswer('hw6', 99, 'd')">Ferry 3</button>
+            <div class="feedback" id="fb-hw6d"></div>
+            <div class="solution-box" id="sol-hw6d">
+                <strong>Solution:</strong><br>
+                Ferry 2 arrives at 12:30 (Success).<br>
+                Ferry 3 arrives at 14:30 (Too late).
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top:30px; text-align:center;">
+        <button onclick="generateReport()" style="background:#f1c40f; color:#2c3e50; font-weight:bold; border:2px solid #2c3e50;">GENERATE MY REPORT 📸</button>
+    </div>
+    
+    <div id="final-report" class="report-card">
+        <div class="report-title">PART 2: MEASUREMENT REPORT</div>
+        
+        <div class="skill-row">
+            <span class="skill-name">Conversions (Q1)</span>
+            <span id="score-units">0/2</span>
+        </div>
+        <div class="skill-row">
+            <span class="skill-name">Area/Perim (Q2, Q3)</span>
+            <span id="score-area">0/3</span>
+        </div>
+        <div class="skill-row">
+            <span class="skill-name">Volume/Speed (Q4, Q5)</span>
+            <span id="score-vol">0/4</span>
+        </div>
+        <div class="skill-row">
+            <span class="skill-name">Timetables (Q6)</span>
+            <span id="score-time">0/4</span>
+        </div>
+        
+        <div class="final-score" id="total-score">0 / 13</div>
+        <div id="teacher-feedback" style="text-align:center; font-weight:bold; color: #fff;"></div>
+        <div class="teacher-note">Take a screenshot of this box and send it to your teacher.</div>
+    </div>
+    
+</div>
+
+<div class="nav-buttons">
+    <button class="btn-outline" id="prev-btn" onclick="moveCard(-1)" style="display:none;">Previous</button>
+    <button id="next-btn" onclick="moveCard(1)" style="display:none;">Next Question</button>
+</div>
+
+<script>
+    let currentCard = 0;
+    const totalCards = 10; // Cards 0 to 9
+    
+    let attempts = {};
+    let hwScores = {
+        'hw1': 0, 'hw1b': 0, 
+        'hw2': 0, 'hw2b': 0,
+        'hw3': 0,
+        'hw4': 0, 'hw4b': 0,
+        'hw5': 0, 'hw5b': 0,
+        'hw6a': 0, 'hw6b': 0, 'hw6c': 0, 'hw6d': 0
+    };
+
+    function moveCard(direction) {
+        document.getElementById(`card-${currentCard}`).classList.remove('active');
+        currentCard += direction;
+        
+        if(currentCard >= totalCards) currentCard = totalCards - 1;
+        if(currentCard < 0) currentCard = 0;
+
+        document.getElementById(`card-${currentCard}`).classList.add('active');
+        
+        const pct = (currentCard / (totalCards - 1)) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+
+        document.getElementById('prev-btn').style.display = currentCard > 0 ? 'block' : 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function nextCard(cardNum) {
+        moveCard(cardNum - currentCard);
+    }
+
+    function checkAnswer(id, correctVal, part = null) {
+        let key = part ? `${id}${part}` : `${id}`;
+        // Handle special D button case
+        let inputId = (part === 'd' || id === 'hw6' && part === 'd') ? null : `ans-${key}`;
+        let fbId = `fb-${key}`;
+        let solId = `sol-${key}`;
+        
+        let userVal;
+        // D button logic
+        if(inputId === null) {
+            userVal = correctVal; // If clicked correct button
+        } else {
+            userVal = parseFloat(document.getElementById(inputId).value.replace(/,/g, ''));
+        }
+        
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        // Check logic
+        let isCorrect = false;
+        if (inputId === null) {
+            // Button click logic (2 is correct answer for ferry 2)
+            isCorrect = (correctVal === 2); 
+        } else {
+            isCorrect = (Math.abs(userVal - correctVal) < 0.1);
+        }
+
+        if (isCorrect) {
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "none";
+            
+            if (id.toString().startsWith('hw')) {
+                hwScores[key] = 1;
+            } else {
+                handleNextLogic(id, part);
+            }
+        } else {
+            if (attempts[key] < 3) {
+                feedback.innerHTML = `❌ Try again (${attempts[key]}/3). Check your calculator.`;
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+            } else {
+                feedback.innerHTML = "❌ 3 Attempts used. See solution.";
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+                
+                if(solution) solution.style.display = "block";
+                
+                if (id.toString().startsWith('hw')) {
+                    hwScores[key] = 0;
+                } else {
+                    handleNextLogic(id, part);
+                }
+            }
+        }
+    }
+
+    function handleNextLogic(id, part) {
+        if(id===1 && part==='a') document.getElementById('part-b-1').style.display = 'block';
+        else if(id===2 && part==='a') document.getElementById('part-b-2').style.display = 'block';
+        else if(id===3 && part==='a') document.getElementById('part-b-3').style.display = 'block';
+        else if(id===5 && part==='a') document.getElementById('part-b-5').style.display = 'block';
+        else if(id===6 && part==='a') document.getElementById('part-b-6').style.display = 'block';
+        else if(id===6 && part==='b') document.getElementById('part-c-6').style.display = 'block';
+        else if(id===7 && part==='a') document.getElementById('part-b-7').style.display = 'block';
+        else if(id===8 && part==='a') document.getElementById('part-b-8').style.display = 'block';
+        else if(id===8 && part==='b') document.getElementById('part-c-8').style.display = 'block';
+        else if(id===8 && part==='c') document.getElementById('part-d-8').style.display = 'block';
+        else document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function generateReport() {
+        let u = hwScores['hw1'] + hwScores['hw1b'];
+        let a = hwScores['hw2'] + hwScores['hw2b'] + hwScores['hw3'];
+        let v = hwScores['hw4'] + hwScores['hw4b'] + hwScores['hw5'] + hwScores['hw5b'];
+        let t = hwScores['hw6a'] + hwScores['hw6b'] + hwScores['hw6c'] + hwScores['hw6d'];
+        let total = u + a + v + t;
+
+        document.getElementById('score-units').innerText = u + "/2";
+        document.getElementById('score-area').innerText = a + "/3";
+        document.getElementById('score-vol').innerText = v + "/4";
+        document.getElementById('score-time').innerText = t + "/4";
+        document.getElementById('total-score').innerText = total + " / 13";
+
+        let msg = "";
+        if (total === 13) msg = "🌟 Measurement Master! Perfect Score.";
+        else if (total >= 9) msg = "👍 Good work. Review your weak areas.";
+        else msg = "⚠️ Focus on your formulas and conversions.";
+        
+        document.getElementById('teacher-feedback').innerText = msg;
+        document.getElementById('final-report').style.display = 'block';
+        document.getElementById('final-report').scrollIntoView({behavior: "smooth"});
+    }
+</script>
+
+</body>
+</html>

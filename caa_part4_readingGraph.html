@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAA Numeracy: Interpreting Data</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+            --bg: #f4f6f7;
+            --card-bg: #ffffff;
+            --calc-color: #e67e22;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--primary); padding: 20px; max-width: 900px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary); margin: 0; }
+        .header p { color: #7f8c8d; }
+        
+        .calc-badge {
+            background: var(--calc-color); color: white; padding: 5px 12px; border-radius: 20px; 
+            font-size: 0.9rem; font-weight: bold; display: inline-block; margin-top: 5px;
+        }
+
+        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s; }
+
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: none; animation: fadeIn 0.5s; }
+        .card.active { display: block; }
+
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+        .context-box { background: #eaf2f8; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 15px; font-style: italic; }
+
+        input[type="number"], input[type="text"] { padding: 10px; font-size: 1rem; border: 2px solid #bdc3c7; border-radius: 6px; width: 140px; }
+        button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        
+        .feedback { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; }
+        
+        .solution-box {
+            display: none; margin-top: 15px; background: #fff3e0; border: 1px solid #d35400; 
+            padding: 15px; border-radius: 8px; color: #d35400;
+        }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        
+        .hw-item { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .hw-item:last-child { border-bottom: none; }
+        .hw-label { font-weight:bold; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px; display:block; }
+
+        .report-card { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-top: 30px; border: 4px solid #f1c40f; display:none; }
+        .report-title { text-align: center; border-bottom: 1px solid #7f8c8d; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; font-weight: bold; }
+        .skill-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .final-score { text-align: center; font-size: 2rem; margin: 20px 0; font-weight: bold; color: #f1c40f; }
+        
+        .graph-container { text-align: center; margin: 15px 0; background: #fff; border: 1px dashed #ccc; padding: 10px; border-radius: 8px; overflow-x: auto; }
+        svg text { font-size: 12px; fill: #333; font-family: sans-serif; }
+        .grid-line { stroke: #eee; stroke-width: 1; }
+        .axis { stroke: #333; stroke-width: 2; }
+        .legend-box { display: inline-block; width: 12px; height: 12px; margin-right: 5px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CAA Numeracy Prep</h1>
+    <p>Part 4: Interpreting Data</p>
+    <div class="calc-badge">🖩 Calculator Allowed</div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="card active" id="card-0">
+    <h2>📊 Graphs & Maps Master Class</h2>
+    <p>We will cover 6 key types of visual data:</p>
+    <ul>
+        <li><strong>Stacked Bars:</strong> Comparing multiple groups.</li>
+        <li><strong>Line Graphs:</strong> Trends over time.</li>
+        <li><strong>Pie Charts:</strong> Proportions & Percentages.</li>
+        <li><strong>Dot Plots:</strong> Frequency & Distributions.</li>
+        <li><strong>Maps:</strong> Directions (N, S, E, W).</li>
+        <li><strong>Coordinates:</strong> Grid references (x, y).</li>
+    </ul>
+    <div style="text-align:center;">
+        <button onclick="nextCard(1)">Start Training</button>
+    </div>
+</div>
+
+<div class="card" id="card-1">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#3498db; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">1. Stacked Bars</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Complex Data</span>
+    </div>
+    <div class="question-text">Transport to School</div>
+    <div class="context-box">
+        <span class="legend-box" style="background:#3498db;"></span>Walk (Bottom) &nbsp;&nbsp;
+        <span class="legend-box" style="background:#e74c3c;"></span>Bus (Top)
+    </div>
+    <div class="graph-container">
+        <svg width="320" height="220" viewBox="0 0 320 220">
+            <line x1="40" y1="180" x2="300" y2="180" class="axis" />
+            <line x1="40" y1="20" x2="40" y2="180" class="axis" />
+            <text x="10" y="100" transform="rotate(-90 10,100)" font-weight="bold">Students</text>
+            <line x1="40" y1="140" x2="300" y2="140" class="grid-line" stroke-dasharray="4"/><text x="20" y="145">10</text>
+            <line x1="40" y1="100" x2="300" y2="100" class="grid-line" stroke-dasharray="4"/><text x="20" y="105">20</text>
+            <line x1="40" y1="60" x2="300" y2="60" class="grid-line" stroke-dasharray="4"/><text x="20" y="65">30</text>
+            <line x1="40" y1="20" x2="300" y2="20" class="grid-line" stroke-dasharray="4"/><text x="20" y="25">40</text>
+
+            <rect x="60" y="120" width="40" height="60" fill="#3498db" />
+            <rect x="60" y="60" width="40" height="60" fill="#e74c3c" />
+            <text x="70" y="200">Yr 9</text>
+
+            <rect x="140" y="140" width="40" height="40" fill="#3498db" />
+            <rect x="140" y="40" width="40" height="100" fill="#e74c3c" />
+            <text x="150" y="200">Yr 10</text>
+
+            <rect x="220" y="100" width="40" height="80" fill="#3498db" />
+            <rect x="220" y="60" width="40" height="40" fill="#e74c3c" />
+            <text x="230" y="200">Yr 11</text>
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> How many Year 9 students <strong>Walk</strong> (Blue)?</p>
+    <input type="number" id="ans-1a" placeholder="Students">
+    <button onclick="checkAnswer(1, 15, 'a')">Check</button>
+    <div class="feedback" id="fb-1a"></div>
+    <div class="solution-box" id="sol-1a">
+        <strong>Solution:</strong> Look at the Blue bar for Yr 9. It aligns exactly halfway between 10 and 20. Answer: 15.
+    </div>
+
+    <div id="part-b-1" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> What is the <strong>Total</strong> number of Year 10 students?</p>
+        <input type="number" id="ans-1b" placeholder="Total">
+        <button onclick="checkAnswer(1, 35, 'b')">Check</button>
+        <div class="feedback" id="fb-1b"></div>
+        <div class="solution-box" id="sol-1b">
+            <strong>Solution:</strong> Look at the very top of the Yr 10 stack. It aligns halfway between 30 and 40. Answer: 35.
+        </div>
+    </div>
+
+    <div id="part-c-1" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> How many Year 10 students take the <strong>Bus</strong> (Red)?</p>
+        <input type="number" id="ans-1c" placeholder="Students">
+        <button onclick="checkAnswer(1, 25, 'c')">Check</button>
+        <div class="feedback" id="fb-1c"></div>
+        <div class="solution-box" id="sol-1c">
+            <strong>Solution:</strong> Top of Stack (35) minus Top of Blue (10) = 25.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-2">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e67e22; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">2. Line Trends</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">6am - 6pm</span>
+    </div>
+    <div class="question-text">Temperature Change</div>
+    <div class="graph-container">
+        <svg width="400" height="200" viewBox="0 0 400 200">
+            <line x1="40" y1="160" x2="380" y2="160" class="axis" />
+            <line x1="40" y1="20" x2="40" y2="160" class="axis" />
+            <text x="15" y="45">30</text><text x="15" y="85">20</text><text x="15" y="125">10</text><text x="20" y="165">0</text>
+            <line x1="40" y1="120" x2="380" y2="120" class="grid-line" stroke-dasharray="2"/>
+            <line x1="40" y1="80" x2="380" y2="80" class="grid-line" stroke-dasharray="2"/>
+            <line x1="40" y1="40" x2="380" y2="40" class="grid-line" stroke-dasharray="2"/>
+            <polyline points="40,140 120,100 200,60 280,48 360,80" fill="none" stroke="#e67e22" stroke-width="3" />
+            <circle cx="40" cy="140" r="4" fill="#e67e22"/><text x="35" y="180">6am</text>
+            <circle cx="120" cy="100" r="4" fill="#e67e22"/><text x="110" y="180">9am</text>
+            <circle cx="200" cy="60" r="4" fill="#e67e22"/><text x="190" y="180">12pm</text>
+            <circle cx="280" cy="48" r="4" fill="#e67e22"/><text x="270" y="180">3pm</text>
+            <circle cx="360" cy="80" r="4" fill="#e67e22"/><text x="350" y="180">6pm</text>
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> What was the temperature at <strong>12pm</strong>?</p>
+    <input type="number" id="ans-2a" placeholder="Degrees">
+    <button onclick="checkAnswer(2, 25, 'a')">Check</button>
+    <div class="feedback" id="fb-2a"></div>
+    <div class="solution-box" id="sol-2a">
+        <strong>Solution:</strong> Find 12pm on the bottom axis. Go up to the dot. Read across to 25.
+    </div>
+
+    <div id="part-b-2" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> Describe the trend between <strong>3pm and 6pm</strong>.</p>
+        <button class="btn-outline" onclick="checkBoolean('2b', 0)">Increasing</button>
+        <button class="btn-outline" onclick="checkBoolean('2b', 1)">Decreasing</button>
+        <div class="feedback" id="fb-2b"></div>
+        <div class="solution-box" id="sol-2b">
+            <strong>Solution:</strong> The line goes DOWN from 3pm to 6pm. That is Decreasing.
+        </div>
+    </div>
+
+    <div id="part-c-2" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> By how many degrees did it rise from <strong>6am to 9am</strong>?</p>
+        <input type="number" id="ans-2c" placeholder="Degrees">
+        <button onclick="checkAnswer(2, 10, 'c')">Check</button>
+        <div class="feedback" id="fb-2c"></div>
+        <div class="solution-box" id="sol-2c"><strong>Solution:</strong> 9am = 15. 6am = 5. Difference = 10.</div>
+    </div>
+</div>
+
+<div class="card" id="card-3">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#9b59b6; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">3. Pie Chart</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Total: 40 People</span>
+    </div>
+    <div class="question-text">Favorite Lunch</div>
+    <div class="graph-container">
+        <svg width="250" height="250" viewBox="0 0 250 250">
+            <path d="M125,125 L125,0 A125,125 0 0,1 244,163 Z" fill="#3498db" /> <path d="M125,125 L244,163 A125,125 0 0,1 51,203 Z" fill="#e74c3c" /> <path d="M125,125 L51,203 A125,125 0 0,1 6,86 Z" fill="#2ecc71" /> <path d="M125,125 L6,86 A125,125 0 0,1 125,0 Z" fill="#f1c40f" /> <text x="160" y="60" fill="white" font-weight="bold">Pizza 40%</text>
+            <text x="160" y="200" fill="white" font-weight="bold">Burger 30%</text>
+            <text x="30" y="160" fill="white" font-weight="bold">Sushi 20%</text>
+            <text x="30" y="60" fill="black" font-weight="bold">Salad 10%</text>
+        </svg>
+    </div>
+    <div class="context-box">Total People Surveyed: <strong>40</strong></div>
+
+    <p><strong>A (Level 1):</strong> Which food is the most popular?</p>
+    <button class="btn-outline" onclick="checkBoolean('3a', 1)">Pizza</button>
+    <button class="btn-outline" onclick="checkBoolean('3a', 0)">Burger</button>
+    <div class="feedback" id="fb-3a"></div>
+    <div class="solution-box" id="sol-3a"><strong>Solution:</strong> Pizza has the largest slice (40%).</div>
+
+    <div id="part-b-3" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> What total percentage voted for <strong>Sushi or Salad</strong>?</p>
+        <input type="number" id="ans-3b" placeholder="%">
+        <button onclick="checkAnswer(3, 30, 'b')">Check</button>
+        <div class="feedback" id="fb-3b"></div>
+        <div class="solution-box" id="sol-3b">
+            <strong>Solution:</strong> Sushi (20%) + Salad (10%) = 30%.
+        </div>
+    </div>
+
+    <div id="part-c-3" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> Calculate the <strong>number of people</strong> who chose <strong>Burger</strong>.</p>
+        <input type="number" id="ans-3c" placeholder="People">
+        <button onclick="checkAnswer(3, 12, 'c')">Check</button>
+        <div class="feedback" id="fb-3c"></div>
+        <div class="solution-box" id="sol-3c">
+            <strong>Solution:</strong> 30% of 40.<br>
+            $0.30 \times 40 = 12$.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-4">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#f1c40f; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">4. Dot Plot</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Frequency</span>
+    </div>
+    <div class="question-text">Hours of Sleep (Class Survey)</div>
+    <div class="graph-container">
+        <svg width="350" height="150" viewBox="0 0 350 150">
+            <line x1="20" y1="130" x2="330" y2="130" stroke="#333" stroke-width="2" />
+            <text x="50" y="145">5</text><text x="100" y="145">6</text>
+            <text x="150" y="145">7</text><text x="200" y="145">8</text>
+            <text x="250" y="145">9</text><text x="300" y="145">10</text>
+            
+            <circle cx="50" cy="120" r="5" fill="#333" />
+            <circle cx="100" cy="120" r="5" fill="#333" /><circle cx="100" cy="105" r="5" fill="#333" />
+            <circle cx="150" cy="120" r="5" fill="#333" /><circle cx="150" cy="105" r="5" fill="#333" /><circle cx="150" cy="90" r="5" fill="#333" /><circle cx="150" cy="75" r="5" fill="#333" />
+            <circle cx="200" cy="120" r="5" fill="#333" /><circle cx="200" cy="105" r="5" fill="#333" /><circle cx="200" cy="90" r="5" fill="#333" />
+            <circle cx="250" cy="120" r="5" fill="#333" /><circle cx="250" cy="105" r="5" fill="#333" />
+            <circle cx="300" cy="120" r="5" fill="#333" />
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> How many students slept for exactly <strong>7 hours</strong>?</p>
+    <input type="number" id="ans-4a" placeholder="Students">
+    <button onclick="checkAnswer(4, 4, 'a')">Check</button>
+    <div class="feedback" id="fb-4a"></div>
+    <div class="solution-box" id="sol-4a"><strong>Solution:</strong> Count the dots above 7. There are 4 dots.</div>
+
+    <div id="part-b-4" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> What is the <strong>Range</strong> of hours slept?</p>
+        <input type="number" id="ans-4b" placeholder="Hours">
+        <button onclick="checkAnswer(4, 5, 'b')">Check</button>
+        <div class="feedback" id="fb-4b"></div>
+        <div class="solution-box" id="sol-4b"><strong>Solution:</strong> High (10) - Low (5) = 5.</div>
+    </div>
+
+    <div id="part-c-4" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> How many students slept <strong>more than 8 hours</strong>?</p>
+        <input type="number" id="ans-4c" placeholder="Students">
+        <button onclick="checkAnswer(4, 3, 'c')">Check</button>
+        <div class="feedback" id="fb-4c"></div>
+        <div class="solution-box" id="sol-4c">
+            <strong>Solution:</strong> Count dots for 9 (2) and 10 (1).<br>
+            $2 + 1 = 3$.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-5">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#2c3e50; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">5. Maps</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Directions</span>
+    </div>
+    <div class="question-text">City Grid</div>
+    <div class="graph-container">
+        <svg width="300" height="300" viewBox="0 0 300 300">
+            <defs><pattern id="mapGrid" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="#ddd" stroke-width="1"/></pattern></defs>
+            <rect width="300" height="300" fill="url(#mapGrid)" />
+            <rect x="120" y="120" width="60" height="60" fill="#2c3e50" /><text x="135" y="155" fill="white">PARK</text>
+            <rect x="120" y="20" width="60" height="40" fill="#e74c3c" /><text x="125" y="45" fill="white">SCHOOL</text>
+            <rect x="20" y="120" width="40" height="60" fill="#3498db" /><text x="25" y="155" fill="white">SHOP</text>
+            <rect x="240" y="120" width="40" height="60" fill="#f1c40f" /><text x="245" y="155" fill="black">HOME</text>
+            <rect x="120" y="240" width="60" height="40" fill="#9b59b6" /><text x="125" y="265" fill="white">POOL</text>
+            <text x="270" y="30" font-weight="bold" font-size="16">N</text>
+            <line x1="275" y1="35" x2="275" y2="70" stroke="black" stroke-width="2" marker-end="url(#arrow)" />
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> Which direction is the <strong>School</strong> from the <strong>Park</strong>?</p>
+    <button class="btn-outline" onclick="checkBoolean('5a', 1)">North</button>
+    <button class="btn-outline" onclick="checkBoolean('5a', 0)">South</button>
+    <div class="feedback" id="fb-5a"></div>
+    <div class="solution-box" id="sol-5a"><strong>Solution:</strong> The School is above the Park, which is North.</div>
+
+    <div id="part-b-5" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> You leave Home, walk <strong>West</strong> past the Park. What do you reach?</p>
+        <button class="btn-outline" onclick="checkBoolean('5b', 1)">Shop</button>
+        <button class="btn-outline" onclick="checkBoolean('5b', 0)">Pool</button>
+        <div class="feedback" id="fb-5b"></div>
+        <div class="solution-box" id="sol-5b"><strong>Solution:</strong> West is Left. Left of Home is Park, then Shop.</div>
+    </div>
+
+    <div id="part-c-5" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> Describe the position of the <strong>Pool</strong> relative to the <strong>Shop</strong>.</p>
+        <button class="btn-outline" onclick="checkBoolean('5c', 0)">North-West</button>
+        <button class="btn-outline" onclick="checkBoolean('5c', 1)">South-East</button>
+        <div class="feedback" id="fb-5c"></div>
+        <div class="solution-box" id="sol-5c"><strong>Solution:</strong> From Shop, go Down (South) and Right (East).</div>
+    </div>
+</div>
+
+<div class="card" id="card-6">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#16a085; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">6. Coordinates</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">(x, y)</span>
+    </div>
+    <div class="question-text">Treasure Island</div>
+    <div class="graph-container">
+        <svg width="300" height="300" viewBox="0 0 300 300">
+            <line x1="30" y1="270" x2="270" y2="270" stroke="black"/> <line x1="30" y1="30" x2="30" y2="270" stroke="black"/> <line x1="30" y1="222" x2="270" y2="222" stroke="#eee" /> <text x="10" y="227">1</text>
+            <line x1="30" y1="174" x2="270" y2="174" stroke="#eee" /> <text x="10" y="179">2</text>
+            <line x1="30" y1="126" x2="270" y2="126" stroke="#eee" /> <text x="10" y="131">3</text>
+            <line x1="30" y1="78" x2="270" y2="78" stroke="#eee" /> <text x="10" y="83">4</text>
+            <text x="78" y="285">1</text><text x="126" y="285">2</text>
+            <text x="174" y="285">3</text><text x="222" y="285">4</text><text x="270" y="285">5</text>
+            <text x="126" y="179" font-size="20">🌴</text> <text x="222" y="83" font-size="20">❌</text> <text x="78" y="83" font-size="20">⛵</text> <text x="222" y="227" font-size="20">💀</text> </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> What are the coordinates of the <strong>Tree</strong> 🌴?</p>
+    <input type="text" id="ans-6a" placeholder="x,y">
+    <button onclick="checkAnswer(6, '2,2', 'a')">Check</button>
+    <div class="feedback" id="fb-6a"></div>
+    <div class="solution-box" id="sol-6a"><strong>Solution:</strong> Go Right 2, Up 2. Answer: 2,2.</div>
+
+    <div id="part-b-6" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> What object is at <strong>(4, 4)</strong>?</p>
+        <button class="btn-outline" onclick="checkBoolean('6b', 1)">Red X</button>
+        <button class="btn-outline" onclick="checkBoolean('6b', 0)">Skull</button>
+        <div class="feedback" id="fb-6b"></div>
+        <div class="solution-box" id="sol-6b"><strong>Solution:</strong> Go Right 4, Up 4. It's the Red X.</div>
+    </div>
+
+    <div id="part-c-6" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> The Ship ⛵ (1, 4) sails <strong>3 Units Right</strong> and <strong>3 Units Down</strong>. Where is it now?</p>
+        <input type="text" id="ans-6c" placeholder="x,y">
+        <button onclick="checkAnswer(6, '4,1', 'c')">Check</button>
+        <div class="feedback" id="fb-6c"></div>
+        <div class="solution-box" id="sol-6c">
+            <strong>Solution:</strong> x: $1+3=4$. y: $4-3=1$.<br>
+            New location: (4, 1) [The Skull].
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-7">
+    <h2>🎉 Training Complete!</h2>
+    <p>Complete this comprehensive homework set.</p>
+    
+    <div class="hw-item">
+        <span class="hw-label">HW Q1: Stacked Bar (Coffee Orders)</span>
+        <div class="graph-container">
+            <svg width="200" height="150" viewBox="0 0 200 150">
+                <line x1="30" y1="130" x2="180" y2="130" stroke="black"/>
+                <line x1="30" y1="130" x2="30" y2="10" stroke="black"/>
+                <rect x="50" y="90" width="30" height="40" fill="#3498db" /> <rect x="50" y="70" width="30" height="20" fill="#e74c3c" /> <rect x="120" y="110" width="30" height="20" fill="#3498db" />
+                <rect x="120" y="50" width="30" height="60" fill="#e74c3c" />
+                
+                <text x="55" y="145">Mon</text><text x="125" y="145">Tue</text>
+                <text x="5" y="75">30</text><text x="5" y="55">40</text>
+                <text x="55" y="100" fill="white" font-size="10">Lat</text>
+                <text x="55" y="80" fill="white" font-size="10">FW</text>
+            </svg>
+        </div>
+        <p><strong>A:</strong> How many Lattes (Blue) on Monday?</p>
+        <input type="number" id="ans-hw1a" placeholder="#">
+        <button onclick="checkAnswer('hw1', 20, 'a')">Check</button>
+        <div class="feedback" id="fb-hw1a"></div>
+        <div class="solution-box" id="sol-hw1a">Solution: Blue bar height is 20.</div>
+        
+        <div id="part-hw1b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> Total coffees on Tuesday?</p>
+            <input type="number" id="ans-hw1b" placeholder="#">
+            <button onclick="checkAnswer('hw1', 40, 'b')">Check</button>
+            <div class="feedback" id="fb-hw1b"></div>
+            <div class="solution-box" id="sol-hw1b">Solution: Top of stack is 40.</div>
+        </div>
+        
+        <div id="part-hw1c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> How many Flat Whites (Red) on Tuesday?</p>
+            <input type="number" id="ans-hw1c" placeholder="#">
+            <button onclick="checkAnswer('hw1', 30, 'c')">Check</button>
+            <div class="feedback" id="fb-hw1c"></div>
+            <div class="solution-box" id="sol-hw1c">Solution: $40 - 10 = 30$.</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q2: Line Graph (Traffic)</span>
+        <div class="graph-container">
+            <svg width="300" height="150" viewBox="0 0 300 150">
+                <line x1="30" y1="130" x2="280" y2="130" stroke="black"/>
+                <polyline points="40,100 120,30 200,80 270,120" fill="none" stroke="#e67e22" stroke-width="2"/>
+                <circle cx="40" cy="100" r="3" fill="black"/><text x="30" y="145">7am</text><text x="10" y="100">100</text>
+                <circle cx="120" cy="30" r="3" fill="black"/><text x="110" y="145">8am</text><text x="10" y="30">300</text>
+                <circle cx="200" cy="80" r="3" fill="black"/><text x="190" y="145">9am</text><text x="10" y="80">150</text>
+                <circle cx="270" cy="120" r="3" fill="black"/><text x="260" y="145">10am</text>
+            </svg>
+        </div>
+        <p><strong>A:</strong> How many cars at 8am?</p>
+        <input type="number" id="ans-hw2a" placeholder="#">
+        <button onclick="checkAnswer('hw2', 300, 'a')">Check</button>
+        <div class="feedback" id="fb-hw2a"></div>
+        <div class="solution-box" id="sol-hw2a">Solution: At 8am, the point is at 300.</div>
+        
+        <div id="part-hw2b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> Trend between 8am and 10am?</p>
+            <button class="btn-outline" onclick="checkBoolean('hw2b', 1)">Decreasing</button>
+            <button class="btn-outline" onclick="checkBoolean('hw2b', 0)">Increasing</button>
+            <div class="feedback" id="fb-hw2b"></div>
+            <div class="solution-box" id="sol-hw2b">Solution: The line goes down.</div>
+        </div>
+        
+        <div id="part-hw2c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> Drop in cars from 8am to 9am?</p>
+            <input type="number" id="ans-hw2c" placeholder="#">
+            <button onclick="checkAnswer('hw2', 150, 'c')">Check</button>
+            <div class="feedback" id="fb-hw2c"></div>
+            <div class="solution-box" id="sol-hw2c">Solution: $300 - 150 = 150$.</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q3: Pie Chart (Candles)</span>
+        <div class="graph-container">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+                <path d="M75,75 L75,0 A75,75 0 0,1 75,150 Z" fill="#3498db" /> <path d="M75,75 L75,150 A75,75 0 0,1 2,52 Z" fill="#e74c3c" /> <path d="M75,75 L2,52 A75,75 0 0,1 75,0 Z" fill="#2ecc71" /> <text x="90" y="50" fill="white" font-size="10">Manuka 50%</text>
+                <text x="30" y="120" fill="white" font-size="10">Fig 30%</text>
+                <text x="20" y="40" fill="white" font-size="10">Other 20%</text>
+            </svg>
+        </div>
+        <div class="context-box">Total Sold: <strong>200</strong></div>
+        <p><strong>A:</strong> Which scent sold the most?</p>
+        <button class="btn-outline" onclick="checkBoolean('hw3a', 1)">Manuka</button>
+        <button class="btn-outline" onclick="checkBoolean('hw3a', 0)">Fig</button>
+        <div class="feedback" id="fb-hw3a"></div>
+        <div class="solution-box" id="sol-hw3a">Solution: Manuka has the biggest slice (50%).</div>
+        
+        <div id="part-hw3b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> Total % for Manuka or Fig?</p>
+            <input type="number" id="ans-hw3b" placeholder="%">
+            <button onclick="checkAnswer('hw3', 80, 'b')">Check</button>
+            <div class="feedback" id="fb-hw3b"></div>
+            <div class="solution-box" id="sol-hw3b">Solution: $50 + 30 = 80$.</div>
+        </div>
+        
+        <div id="part-hw3c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> How many Manuka candles sold?</p>
+            <input type="number" id="ans-hw3c" placeholder="#">
+            <button onclick="checkAnswer('hw3', 100, 'c')">Check</button>
+            <div class="feedback" id="fb-hw3c"></div>
+            <div class="solution-box" id="sol-hw3c">Solution: 50% of 200 is 100.</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q4: Dot Plot (Dice Rolls)</span>
+        <div class="graph-container">
+            <svg width="200" height="100">
+                <line x1="10" y1="80" x2="190" y2="80" stroke="black"/>
+                <text x="30" y="95">1</text><text x="70" y="95">2</text><text x="110" y="95">3</text><text x="150" y="95">4</text>
+                <circle cx="30" cy="70" r="4" fill="black"/><circle cx="30" cy="60" r="4" fill="black"/>
+                <circle cx="70" cy="70" r="4" fill="black"/><circle cx="70" cy="60" r="4" fill="black"/><circle cx="70" cy="50" r="4" fill="black"/>
+                <circle cx="110" cy="70" r="4" fill="black"/>
+                <circle cx="150" cy="70" r="4" fill="black"/><circle cx="150" cy="60" r="4" fill="black"/>
+            </svg>
+        </div>
+        <p><strong>A:</strong> How many times was '2' rolled?</p>
+        <input type="number" id="ans-hw4a" placeholder="#">
+        <button onclick="checkAnswer('hw4', 3, 'a')">Check</button>
+        <div class="feedback" id="fb-hw4a"></div>
+        <div class="solution-box" id="sol-hw4a">Solution: There are 3 dots above number 2.</div>
+        
+        <div id="part-hw4b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> Range of results?</p>
+            <input type="number" id="ans-hw4b" placeholder="#">
+            <button onclick="checkAnswer('hw4', 3, 'b')">Check</button>
+            <div class="feedback" id="fb-hw4b"></div>
+            <div class="solution-box" id="sol-hw4b">Solution: Max (4) - Min (1) = 3.</div>
+        </div>
+        
+        <div id="part-hw4c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> How many rolls were greater than 2?</p>
+            <input type="number" id="ans-hw4c" placeholder="#">
+            <button onclick="checkAnswer('hw4', 3, 'c')">Check</button>
+            <div class="feedback" id="fb-hw4c"></div>
+            <div class="solution-box" id="sol-hw4c">Solution: Dots for 3 (1) + Dots for 4 (2) = 3.</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q5: Map (Lake Grid)</span>
+        <div class="graph-container">
+            <svg width="200" height="200" viewBox="0 0 200 200">
+                <rect width="200" height="200" fill="#e8f6f3"/>
+                <rect x="90" y="160" width="20" height="20" fill="black"/><text x="80" y="190" font-size="10">CARPARK</text>
+                <rect x="90" y="20" width="20" height="20" fill="red"/><text x="80" y="15" font-size="10">HOLIDAY PARK</text>
+                <rect x="160" y="90" width="20" height="20" fill="blue"/><text x="160" y="120" font-size="10">BEACH</text>
+                <text x="10" y="20" font-weight="bold">N</text>
+            </svg>
+        </div>
+        <p><strong>A:</strong> Direction from Carpark to Holiday Park?</p>
+        <button class="btn-outline" onclick="checkBoolean('hw5a', 1)">North</button>
+        <button class="btn-outline" onclick="checkBoolean('hw5a', 0)">East</button>
+        <div class="feedback" id="fb-hw5a"></div>
+        <div class="solution-box" id="sol-hw5a">Solution: Holiday Park is at the top (North).</div>
+        
+        <div id="part-hw5b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> You walk East from the Center. What do you hit?</p>
+            <button class="btn-outline" onclick="checkBoolean('hw5b', 1)">Beach</button>
+            <button class="btn-outline" onclick="checkBoolean('hw5b', 0)">Carpark</button>
+            <div class="feedback" id="fb-hw5b"></div>
+            <div class="solution-box" id="sol-hw5b">Solution: East is Right. The Beach is on the right.</div>
+        </div>
+        
+        <div id="part-hw5c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> Where is the Beach relative to the Holiday Park?</p>
+            <button class="btn-outline" onclick="checkBoolean('hw5c', 1)">South-East</button>
+            <button class="btn-outline" onclick="checkBoolean('hw5c', 0)">North-West</button>
+            <div class="feedback" id="fb-hw5c"></div>
+            <div class="solution-box" id="sol-hw5c">Solution: It is Down (South) and Right (East).</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q6: Coordinates (Logo)</span>
+        <div class="graph-container">
+            <svg width="200" height="200" viewBox="0 0 200 200">
+                <line x1="20" y1="180" x2="180" y2="180" stroke="black"/>
+                <line x1="20" y1="20" x2="20" y2="180" stroke="black"/>
+                <text x="60" y="195">1</text><text x="100" y="195">2</text><text x="140" y="195">3</text>
+                <text x="5" y="140">1</text><text x="5" y="100">2</text><text x="5" y="60">3</text>
+                <text x="140" y="60" font-size="20">⭐</text> <text x="60" y="140" font-size="20">🔵</text> </svg>
+        </div>
+        <p><strong>A:</strong> Coords of Blue Circle?</p>
+        <input type="text" id="ans-hw6a" placeholder="x,y">
+        <button onclick="checkAnswer('hw6', '1,1', 'a')">Check</button>
+        <div class="feedback" id="fb-hw6a"></div>
+        <div class="solution-box" id="sol-hw6a">Solution: Right 1, Up 1.</div>
+        
+        <div id="part-hw6b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> What is at (3,3)?</p>
+            <button class="btn-outline" onclick="checkBoolean('hw6b', 1)">Star</button>
+            <button class="btn-outline" onclick="checkBoolean('hw6b', 0)">Circle</button>
+            <div class="feedback" id="fb-hw6b"></div>
+            <div class="solution-box" id="sol-hw6b">Solution: Right 3, Up 3 leads to the Star.</div>
+        </div>
+        
+        <div id="part-hw6c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> Move Circle 2 Right, 1 Up. New Coords?</p>
+            <input type="text" id="ans-hw6c" placeholder="x,y">
+            <button onclick="checkAnswer('hw6', '3,2', 'c')">Check</button>
+            <div class="feedback" id="fb-hw6c"></div>
+            <div class="solution-box" id="sol-hw6c">Solution: $1+2=3$ and $1+1=2$. Answer: 3,2.</div>
+        </div>
+    </div>
+
+    <div style="margin-top:30px; text-align:center;">
+        <button onclick="generateReport()" style="background:#f1c40f; color:#2c3e50; font-weight:bold; border:2px solid #2c3e50;">GENERATE MY REPORT 📸</button>
+    </div>
+    
+    <div id="final-report" class="report-card">
+        <div class="report-title">PART 4: DATA REPORT</div>
+        <div class="skill-row"><span class="skill-name">Comparison & Trends (Q1, Q2)</span><span id="score-trend">0/6</span></div>
+        <div class="skill-row"><span class="skill-name">Proportions & Frequency (Q3, Q4)</span><span id="score-freq">0/6</span></div>
+        <div class="skill-row"><span class="skill-name">Spatial Reasoning (Q5, Q6)</span><span id="score-space">0/6</span></div>
+        <div class="final-score" id="total-score">0 / 18</div>
+        <div id="teacher-feedback" style="text-align:center; font-weight:bold; color: #fff;"></div>
+        <div class="teacher-note">Take a screenshot of this box and send it to your teacher.</div>
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <button class="btn-outline" id="prev-btn" onclick="moveCard(-1)" style="display:none;">Previous</button>
+    <button id="next-btn" onclick="moveCard(1)" style="display:none;">Next Question</button>
+</div>
+
+<script>
+    let currentCard = 0;
+    const totalCards = 8; // Cards 0 to 7
+    
+    let attempts = {};
+    let hwScores = {
+        'hw1a':0,'hw1b':0,'hw1c':0,
+        'hw2a':0,'hw2b':0,'hw2c':0,
+        'hw3a':0,'hw3b':0,'hw3c':0,
+        'hw4a':0,'hw4b':0,'hw4c':0,
+        'hw5a':0,'hw5b':0,'hw5c':0,
+        'hw6a':0,'hw6b':0,'hw6c':0
+    };
+
+    function moveCard(direction) {
+        document.getElementById(`card-${currentCard}`).classList.remove('active');
+        currentCard += direction;
+        
+        if(currentCard >= totalCards) currentCard = totalCards - 1;
+        if(currentCard < 0) currentCard = 0;
+
+        document.getElementById(`card-${currentCard}`).classList.add('active');
+        
+        const pct = (currentCard / (totalCards - 1)) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+
+        document.getElementById('prev-btn').style.display = currentCard > 0 ? 'block' : 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function nextCard(cardNum) {
+        moveCard(cardNum - currentCard);
+    }
+
+    function checkAnswer(id, correctVal, part = null) {
+        let key = part ? `${id}${part}` : `${id}`;
+        let inputId = `ans-${key}`;
+        let fbId = `fb-${key}`;
+        let solId = `sol-${key}`;
+        
+        let valRaw = document.getElementById(inputId).value.replace(/,/g, '').trim();
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        let isCorrect = false;
+        if (typeof correctVal === 'string') {
+            isCorrect = valRaw === correctVal;
+        } else {
+            isCorrect = (Math.abs(parseFloat(valRaw) - correctVal) < 0.1);
+        }
+
+        if (isCorrect) {
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "none";
+            
+            if (id.toString().startsWith('hw')) {
+                hwScores[key] = 1;
+                handleHWNext(id, part);
+            } else {
+                handleNext(id, part);
+            }
+        } else {
+            handleWrong(key, feedback, solution, id, part);
+        }
+    }
+
+    function checkBoolean(key, isCorrectChoice) {
+        let fbId = `fb-${key}`;
+        let solId = `sol-${key}`;
+        
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        if (isCorrectChoice === 1) { // 1 = Correct
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "none";
+            
+            if (key.startsWith('hw')) {
+                hwScores[key] = 1;
+                // Parse key to get ID and Part (e.g., hw1a -> id=hw1, part=a)
+                let id = key.substring(0,3); 
+                let part = key.substring(3);
+                handleHWNext(id, part);
+            } else {
+                let id = key.substring(0,1);
+                let part = key.substring(1);
+                handleNext(id, part);
+            }
+        } else {
+            if (attempts[key] < 3) {
+                feedback.innerHTML = "❌ Incorrect. Try again.";
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+            } else {
+                feedback.innerHTML = "❌ 3 Attempts used. See solution below.";
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+                
+                // Show solution box if it exists
+                if(solution) solution.style.display = "block";
+                
+                if (key.startsWith('hw')) {
+                    hwScores[key] = 0;
+                    let id = key.substring(0,3);
+                    let part = key.substring(3);
+                    handleHWNext(id, part);
+                } else {
+                    let id = key.substring(0,1);
+                    let part = key.substring(1);
+                    handleNext(id, part);
+                }
+            }
+        }
+    }
+
+    function handleWrong(key, feedback, solution, id, part) {
+        if (attempts[key] < 3) {
+            feedback.innerHTML = `❌ Try again (${attempts[key]}/3).`;
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+        } else {
+            feedback.innerHTML = "❌ 3 Attempts used. See solution.";
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "block";
+            
+            if (id.toString().startsWith('hw')) {
+                hwScores[key] = 0;
+                handleHWNext(id, part);
+            }
+            else handleNext(id, part);
+        }
+    }
+
+    function handleNext(id, part) {
+        // Force string matching for ID
+        let sid = id.toString();
+        
+        // Card 1
+        if(sid === '1') {
+             if(part === 'a') document.getElementById('part-b-1').style.display = 'block';
+             else if(part === 'b') document.getElementById('part-c-1').style.display = 'block';
+             else if(part === 'c') document.getElementById('next-btn').style.display = 'block';
+        }
+        // Card 2
+        else if(sid === '2' || sid === '2b') { 
+             if(part === 'a') document.getElementById('part-b-2').style.display = 'block';
+             else if(sid === '2b' || part === 'b') document.getElementById('part-c-2').style.display = 'block';
+             else if(part === 'c') document.getElementById('next-btn').style.display = 'block';
+        }
+        // Card 3
+        else if(sid === '3' || sid === '3a') {
+             if(sid === '3a' || part === 'a') document.getElementById('part-b-3').style.display = 'block';
+             else if(part === 'b') document.getElementById('part-c-3').style.display = 'block';
+             else if(part === 'c') document.getElementById('next-btn').style.display = 'block';
+        }
+        // Card 4
+        else if(sid === '4') {
+             if(part === 'a') document.getElementById('part-b-4').style.display = 'block';
+             else if(part === 'b') document.getElementById('part-c-4').style.display = 'block';
+             else if(part === 'c') document.getElementById('next-btn').style.display = 'block';
+        }
+        // Card 5
+        else if(sid === '5' || sid === '5a' || sid === '5b' || sid === '5c') {
+             if(sid === '5a' || part === 'a') document.getElementById('part-b-5').style.display = 'block';
+             else if(sid === '5b' || part === 'b') document.getElementById('part-c-5').style.display = 'block';
+             else if(sid === '5c' || part === 'c') document.getElementById('next-btn').style.display = 'block';
+        }
+        // Card 6
+        else if(sid === '6' || sid === '6b') {
+             if(part === 'a') document.getElementById('part-b-6').style.display = 'block';
+             else if(sid === '6b' || part === 'b') document.getElementById('part-c-6').style.display = 'block';
+             else if(part === 'c') document.getElementById('next-btn').style.display = 'block';
+        }
+    }
+
+    function handleHWNext(id, part) {
+        // Homework Logic - Unlock next parts
+        if(part === 'a') document.getElementById(`part-${id}b`).style.display = 'block';
+        else if(part === 'b') document.getElementById(`part-${id}c`).style.display = 'block';
+    }
+
+    function generateReport() {
+        let trend = hwScores['hw1a'] + hwScores['hw1b'] + hwScores['hw1c'] +
+                    hwScores['hw2a'] + hwScores['hw2b'] + hwScores['hw2c'];
+
+        let freq = hwScores['hw3a'] + hwScores['hw3b'] + hwScores['hw3c'] +
+                   hwScores['hw4a'] + hwScores['hw4b'] + hwScores['hw4c'];
+
+        let space = hwScores['hw5a'] + hwScores['hw5b'] + hwScores['hw5c'] +
+                    hwScores['hw6a'] + hwScores['hw6b'] + hwScores['hw6c'];
+
+        let total = trend + freq + space;
+
+        document.getElementById('score-trend').innerText = trend + "/6";
+        document.getElementById('score-freq').innerText = freq + "/6";
+        document.getElementById('score-space').innerText = space + "/6";
+        document.getElementById('total-score').innerText = total + " / 18";
+
+        let msg = "";
+        if (total === 18) msg = "🌟 Data Master! Perfect Score.";
+        else if (total >= 12) msg = "👍 Good work. Check the graphs carefully.";
+        else msg = "⚠️ Review your coordinates and map skills.";
+        
+        document.getElementById('teacher-feedback').innerText = msg;
+        document.getElementById('final-report').style.display = 'block';
+        document.getElementById('final-report').scrollIntoView({behavior: "smooth"});
+    }
+</script>
+
+</body>
+</html>

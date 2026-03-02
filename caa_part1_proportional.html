@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAA Numeracy: Proportional Reasoning</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+            --bg: #f4f6f7;
+            --card-bg: #ffffff;
+            --calc-color: #e67e22;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--primary); padding: 20px; max-width: 900px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary); margin: 0; }
+        .header p { color: #7f8c8d; }
+        
+        .calc-badge {
+            background: var(--calc-color); color: white; padding: 5px 12px; border-radius: 20px; 
+            font-size: 0.9rem; font-weight: bold; display: inline-block; margin-top: 5px;
+        }
+
+        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s; }
+
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: none; animation: fadeIn 0.5s; }
+        .card.active { display: block; }
+
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+        .context-box { background: #eaf2f8; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 15px; font-style: italic; }
+
+        input[type="number"], input[type="text"] { padding: 10px; font-size: 1rem; border: 2px solid #bdc3c7; border-radius: 6px; width: 140px; }
+        button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        
+        .feedback { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; }
+        
+        /* Solution Box Styles */
+        .solution-box {
+            display: none; margin-top: 15px; background: #fff3e0; border: 1px solid #e67e22; 
+            padding: 15px; border-radius: 8px; color: #d35400;
+        }
+        .calc-steps { font-family: monospace; background: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; display: inline-block; margin-top: 5px; }
+        .key { border: 1px solid #999; padding: 2px 6px; border-radius: 4px; background: #eee; box-shadow: 0 2px 0 #999; font-size: 0.9em; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        
+        /* Homework List Styles */
+        .hw-item { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .hw-item:last-child { border-bottom: none; }
+        .hw-label { font-weight:bold; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px; display:block; }
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; }
+        .data-table th, .data-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .data-table th { background-color: #f2f2f2; }
+
+        /* Report Card */
+        .report-card { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-top: 30px; border: 4px solid #f1c40f; display:none; }
+        .report-title { text-align: center; border-bottom: 1px solid #7f8c8d; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; font-weight: bold; }
+        .skill-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .skill-name { font-weight: bold; }
+        .final-score { text-align: center; font-size: 2rem; margin: 20px 0; font-weight: bold; color: #f1c40f; }
+        .teacher-note { font-style: italic; text-align: center; font-size: 0.9rem; color: #bdc3c7; margin-top: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CAA Numeracy Prep</h1>
+    <p>Part 1: Proportional Reasoning</p>
+    <div class="calc-badge">🖩 Calculator Allowed</div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="card active" id="card-0">
+    <h2>👋 Welcome to Proportional Reasoning</h2>
+    <p>This module covers the key skills for the Numeracy Exam:</p>
+    <ul>
+        <li><strong>Percentages:</strong> Conversions & Amounts.</li>
+        <li><strong>Fractions:</strong> Finding parts & Reversing.</li>
+        <li><strong>Ratios:</strong> Sharing amounts.</li>
+        <li><strong>Rates:</strong> The Unitary Method.</li>
+    </ul>
+    <p><strong>Remember:</strong> You are allowed to use a calculator for every question!</p>
+    <div style="text-align:center;">
+        <button onclick="nextCard(1)">Start Training</button>
+    </div>
+</div>
+
+<div class="card" id="card-1">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#f1c40f; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Level 1: The Basics</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">🖩 Use Calc</span>
+    </div>
+    <div class="question-text">Convert this fraction to a percentage.</div>
+    <div class="context-box">
+        Tip: To turn a fraction like $\frac{3}{5}$ into %, divide the top by the bottom, then multiply by 100.<br>
+        $$3 \div 5 = 0.6 \rightarrow 0.6 \times 100 = 60\%$$
+    </div>
+    <p><strong>Question:</strong> What is $\frac{3}{4}$ as a percentage?</p>
+    <input type="number" id="ans-1" placeholder="%">
+    <button onclick="checkAnswer(1, 75)">Check</button>
+    
+    <div class="feedback" id="fb-1"></div>
+    <div class="solution-box" id="sol-1">
+        <strong>Solution:</strong><br>
+        Method 1: <span class="calc-steps"><span class="key">3</span> <span class="key">÷</span> <span class="key">4</span> <span class="key">×</span> <span class="key">100</span> <span class="key">=</span></span><br>
+        Result: <strong>75%</strong>
+    </div>
+</div>
+
+<div class="card" id="card-2">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e67e22; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Level 2: Finding Amounts</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">🖩 Use Calc</span>
+    </div>
+    <div class="question-text">Calculate a percentage of a number.</div>
+    <p><strong>Question:</strong> A shop has a sale. A $80 jacket is <strong>20% off</strong>.</p>
+    <p>How much money do you save?</p>
+    <input type="number" id="ans-2" placeholder="$">
+    <button onclick="checkAnswer(2, 16)">Check</button>
+    
+    <div class="feedback" id="fb-2"></div>
+    <div class="solution-box" id="sol-2">
+        <strong>Solution:</strong><br>
+        <em>Method 1 (Decimal):</em> Turn 20% to 0.20 and multiply.<br>
+        <span class="calc-steps"><span class="key">0</span> <span class="key">.</span> <span class="key">2</span> <span class="key">0</span> <span class="key">×</span> <span class="key">8</span> <span class="key">0</span> <span class="key">=</span></span><br><br>
+        <em>Method 2 (% Key):</em><br>
+        <span class="calc-steps"><span class="key">8</span> <span class="key">0</span> <span class="key">×</span> <span class="key">2</span> <span class="key">0</span> <span class="key">SHIFT</span> <span class="key">%</span> <span class="key">=</span></span><br>
+        Result: <strong>$16</strong>
+    </div>
+</div>
+
+<div class="card" id="card-3">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e74c3c; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Level 3: Exam Question (2023)</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">🖩 Use Calc</span>
+    </div>
+    <div class="question-text">The "Jersey Cow" Problem</div>
+    <div class="context-box">
+        "There are 6,000,000 cows in New Zealand. 7.5% of them are Jersey cows."
+    </div>
+    <p><strong>Question:</strong> Calculate the total number of Jersey cows.</p>
+    <input type="number" id="ans-3" placeholder="Number of cows">
+    <button onclick="checkAnswer(3, 450000)">Check</button>
+    
+    <div class="feedback" id="fb-3"></div>
+    <div class="solution-box" id="sol-3">
+        <strong>Solution:</strong><br>
+        <em>Method 1 (Decimal):</em> $7.5 \div 100 = 0.075$.<br>
+        <span class="calc-steps"><span class="key">0</span> <span class="key">.</span> <span class="key">0</span> <span class="key">7</span> <span class="key">5</span> <span class="key">×</span> <span class="key">6000000</span> <span class="key">=</span></span><br><br>
+        <em>Method 2 (% Key):</em><br>
+        <span class="calc-steps"><span class="key">6000000</span> <span class="key">×</span> <span class="key">7</span> <span class="key">.</span> <span class="key">5</span> <span class="key">SHIFT</span> <span class="key">%</span> <span class="key">=</span></span><br>
+        Result: <strong>450,000</strong>
+    </div>
+</div>
+
+<div class="card" id="card-4">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#8e44ad; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Level 4: Comparison (2023)</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">🖩 Use Calc</span>
+    </div>
+    <div class="question-text">Interpreting Survey Results</div>
+    <div class="context-box">
+        "A survey asked 500 people if they liked a new flavour. 300 people said YES."
+    </div>
+    <p><strong>Question A:</strong> What percentage of people said YES?</p>
+    <input type="number" id="ans-4a" placeholder="%">
+    <button onclick="checkAnswer(4, 60, 'a')">Check %</button>
+    <div class="feedback" id="fb-4a"></div>
+    <div class="solution-box" id="sol-4a">
+        <strong>Solution:</strong><br>
+        "300 out of 500" is a fraction $\frac{300}{500}$.<br>
+        Calculator: <span class="calc-steps"><span class="key">300</span> <span class="key">÷</span> <span class="key">500</span> <span class="key">×</span> <span class="key">100</span> <span class="key">=</span></span><br>
+        Result: <strong>60%</strong>
+    </div>
+    
+    <div id="part-b-4" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <p><strong>Question B:</strong> A news report claims "Less than 55% of people liked the flavour." Is this claim correct?</p>
+        <button class="btn-outline" onclick="checkClaim(4, false)">Yes, it's correct</button>
+        <button class="btn-outline" onclick="checkClaim(4, true)">No, it's incorrect</button>
+        <div class="feedback" id="fb-4b"></div>
+    </div>
+</div>
+
+<div class="card" id="card-5">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#16a085; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Level 5: Fractions</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">🖩 Use Calc</span>
+    </div>
+    <div class="question-text">Fraction of an Amount</div>
+    <div class="context-box">
+        <strong>Forward:</strong> To find $\frac{2}{3}$ of 60, calculate $60 \div 3 \times 2$.<br>
+        <strong>Reverse:</strong> If 10 is $\frac{1}{4}$ of a number, calculate $10 \times 4$ to find the total.
+    </div>
+    
+    <p><strong>Question A (Forward):</strong> Calculate $\frac{3}{5}$ of 150.</p>
+    <input type="number" id="ans-5a" placeholder="Answer">
+    <button onclick="checkAnswer(5, 90, 'a')">Check</button>
+    <div class="feedback" id="fb-5a"></div>
+    <div class="solution-box" id="sol-5a">
+        <strong>Solution:</strong><br>
+        Divide by bottom, multiply by top.<br>
+        <span class="calc-steps"><span class="key">150</span> <span class="key">÷</span> <span class="key">5</span> <span class="key">×</span> <span class="key">3</span> <span class="key">=</span></span><br>
+        Result: <strong>90</strong>
+    </div>
+
+    <div id="part-b-5" style="display:none; margin-top:20px; border-top:1px solid #eee; padding-top:20px;">
+        <p><strong>Question B (Reverse):</strong> 24 is $\frac{2}{3}$ of a mystery number. What is the mystery number?</p>
+        <input type="number" id="ans-5b" placeholder="Total">
+        <button onclick="checkAnswer(5, 36, 'b')">Check</button>
+        <div class="feedback" id="fb-5b"></div>
+        <div class="solution-box" id="sol-5b">
+            <strong>Solution (Reverse):</strong><br>
+            If 2 parts = 24, then 1 part = 12 ($24 \div 2$).<br>
+            The whole is 3 parts, so $12 \times 3 = 36$.<br>
+            <span class="calc-steps"><span class="key">24</span> <span class="key">÷</span> <span class="key">2</span> <span class="key">×</span> <span class="key">3</span> <span class="key">=</span></span><br>
+            Result: <strong>36</strong>
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-6">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#2980b9; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Level 6: Ratios</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">🖩 Use Calc</span>
+    </div>
+    <div class="question-text">Sharing in a Ratio</div>
+    <div class="context-box">
+        To share an amount in ratio <strong>2:3</strong>:<br>
+        1. Add parts: $2+3=5$<br>
+        2. Divide total by parts: $\text{Total} \div 5 = \text{1 share}$<br>
+        3. Multiply: $\times 2$ and $\times 3$.
+    </div>
+    <p><strong>Question:</strong> Share $500 in the ratio <strong>2:3</strong>.</p>
+    <p>What is the <strong>larger</strong> share?</p>
+    <input type="number" id="ans-6" placeholder="$">
+    <button onclick="checkAnswer(6, 300)">Check</button>
+    <div class="feedback" id="fb-6"></div>
+    <div class="solution-box" id="sol-6">
+        <strong>Solution:</strong><br>
+        1. Total parts: $2 + 3 = 5$.<br>
+        2. One share: $500 \div 5 = 100$.<br>
+        3. Larger share (3 parts): $100 \times 3 = 300$.<br>
+        <span class="calc-steps"><span class="key">500</span> <span class="key">÷</span> <span class="key">5</span> <span class="key">×</span> <span class="key">3</span> <span class="key">=</span></span><br>
+        Result: <strong>$300</strong>
+    </div>
+</div>
+
+<div class="card" id="card-7">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#8e44ad; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">Level 7: Rates</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">🖩 Use Calc</span>
+    </div>
+    <div class="question-text">The Unitary Method</div>
+    <div class="context-box">
+        To solve rate problems, find the value of <strong>ONE</strong> unit first.
+    </div>
+    <p><strong>Question:</strong> 4 kg of apples cost $14.00. How much do 7 kg cost?</p>
+    <input type="number" id="ans-7" placeholder="$">
+    <button onclick="checkAnswer(7, 24.5)">Check</button>
+    <div class="feedback" id="fb-7"></div>
+    <div class="solution-box" id="sol-7">
+        <strong>Solution:</strong><br>
+        1. Find cost of 1 kg: $14 \div 4 = 3.5$.<br>
+        2. Find cost of 7 kg: $3.5 \times 7 = 24.5$.<br>
+        <span class="calc-steps"><span class="key">14</span> <span class="key">÷</span> <span class="key">4</span> <span class="key">×</span> <span class="key">7</span> <span class="key">=</span></span><br>
+        Result: <strong>$24.50</strong>
+    </div>
+</div>
+
+<div class="card" id="card-8">
+    <h2>🎉 Training Complete!</h2>
+    <p>Now complete this full set of questions from past papers.</p>
+    <p><em>Finish all questions to generate your report.</em></p>
+    
+    <div class="hw-item">
+        <span class="hw-label">HW Q1 (Percentage)</span>
+        <div class="question-text">Candle Sales: Calculate 70% of $18.</div>
+        <p><em>(Hint: Use the 0.70 method or the % key)</em></p>
+        <input type="number" id="ans-hw1" placeholder="$">
+        <button onclick="checkAnswer('hw1', 12.60)">Check</button>
+        <div class="feedback" id="fb-hw1"></div>
+        <div class="solution-box" id="sol-hw1">
+            <strong>Solution:</strong><br>
+            <span class="calc-steps"><span class="key">18</span> <span class="key">×</span> <span class="key">70</span> <span class="key">SHIFT</span> <span class="key">%</span> <span class="key">=</span></span><br>
+            Result: <strong>$12.60</strong>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q2 (Percentage Addition)</span>
+        <div class="question-text">Survey Data: In a town survey, 16% chose 'Happy' and 40% chose 'Very Happy'.</div>
+        <p>What is the <strong>total percentage</strong> of people who were Happy or Very Happy?</p>
+        <input type="number" id="ans-hw2" placeholder="%">
+        <button onclick="checkAnswer('hw2', 56)">Check</button>
+        <div class="feedback" id="fb-hw2"></div>
+        <div class="solution-box" id="sol-hw2">
+            <strong>Solution:</strong><br>
+            Simply add the two percentages together.<br>
+            $16 + 40 = 56$<br>
+            Result: <strong>56%</strong>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q3 (Rate)</span>
+        <div class="question-text">Rates: A tap drips 20mL of water every minute.</div>
+        <p>How much water drips in <strong>135 minutes</strong> (2.25 hours)?</p>
+        <input type="number" id="ans-hw3" placeholder="mL">
+        <button onclick="checkAnswer('hw3', 2700)">Check</button>
+        <div class="feedback" id="fb-hw3"></div>
+        <div class="solution-box" id="sol-hw3">
+            <strong>Solution:</strong><br>
+            Multiply rate by time.<br>
+            <span class="calc-steps"><span class="key">20</span> <span class="key">×</span> <span class="key">135</span> <span class="key">=</span></span><br>
+            Result: <strong>2700 mL</strong>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q4 (Proportional Rate)</span>
+        <div class="question-text">Proportion: A walking team travels 35km in 3 days.</div>
+        <p>At the same rate, how far would they travel in <strong>2 days</strong>? (Round to 1 d.p)</p>
+        <input type="number" id="ans-hw4" placeholder="km">
+        <button onclick="checkAnswer('hw4', 23.3)">Check</button>
+        <div class="feedback" id="fb-hw4"></div>
+        <div class="solution-box" id="sol-hw4">
+            <strong>Solution:</strong><br>
+            First find 1 day: $35 \div 3 = 11.666...$<br>
+            Then multiply by 2: $11.666 \times 2 = 23.333...$<br>
+            Result: <strong>23.3 km</strong>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q5 (Percentage)</span>
+        <div class="question-text">Budgeting: You have expenses of \$212.50 and income of \$450.</div>
+        <p>What <strong>percentage</strong> of your income is spent on expenses? (Round to 1 d.p)</p>
+        <input type="number" id="ans-hw5" placeholder="%">
+        <button onclick="checkAnswer('hw5', 47.2)">Check</button>
+        <div class="feedback" id="fb-hw5"></div>
+        <div class="solution-box" id="sol-hw5">
+            <strong>Solution:</strong><br>
+            Divide part by total, then multiply by 100.<br>
+            <span class="calc-steps"><span class="key">212.50</span> <span class="key">÷</span> <span class="key">450</span> <span class="key">×</span> <span class="key">100</span> <span class="key">=</span></span><br>
+            Result: <strong>47.2%</strong>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q6 (Ratio Context)</span>
+        <div class="question-text">Mixing Drinks: You mix syrup and water in the ratio <strong>1:4</strong>.</div>
+        <p>You make <strong>500mL</strong> of drink in total. How much <strong>syrup</strong> did you use?</p>
+        <input type="number" id="ans-hw6" placeholder="mL">
+        <button onclick="checkAnswer('hw6', 100)">Check</button>
+        <div class="feedback" id="fb-hw6"></div>
+        <div class="solution-box" id="sol-hw6">
+            <strong>Solution:</strong><br>
+            1. Total parts: $1 + 4 = 5$.<br>
+            2. One part (Syrup): $500 \div 5 = 100$.<br>
+            Result: <strong>100 mL</strong>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q7 (Reverse Fraction)</span>
+        <div class="question-text">Spending Money: You spent $\frac{3}{5}$ of your money on a gift. The gift cost <strong>$30</strong>.</div>
+        <p>How much money did you have <strong>originally</strong>?</p>
+        <input type="number" id="ans-hw7" placeholder="$">
+        <button onclick="checkAnswer('hw7', 50)">Check</button>
+        <div class="feedback" id="fb-hw7"></div>
+        <div class="solution-box" id="sol-hw7">
+            <strong>Solution (Reverse):</strong><br>
+            If 3 parts = $30, then 1 part = $10 ($30 \div 3$).<br>
+            Total is 5 parts, so $10 \times 5 = 50$.<br>
+            Result: <strong>$50</strong>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q8 (Rate)</span>
+        <div class="question-text">Traffic Flow Rate</div>
+        <div class="context-box">
+            A traffic camera recorded vehicles passing an intersection.<br>
+            <strong>Data Table:</strong>
+            <table class="data-table">
+                <tr><th>Time</th><th>Number of Vehicles</th></tr>
+                <tr><td>7:00 am - 8:00 am</td><td>225</td></tr>
+                <tr><td>8:00 am - 9:00 am</td><td>250</td></tr>
+            </table>
+        </div>
+        <p>Calculate the average number of vehicles <strong>per minute</strong> between 7:00 am and 8:00 am.</p>
+        <p><em>(Hint: How many minutes are in that hour?)</em></p>
+        <input type="number" id="ans-hw8" placeholder="vehicles/min">
+        <button onclick="checkAnswer('hw8', 3.75)">Check</button>
+        <div class="feedback" id="fb-hw8"></div>
+        <div class="solution-box" id="sol-hw8">
+            <strong>Solution:</strong><br>
+            1. Total vehicles: 225.<br>
+            2. Total minutes: 60 (1 hour).<br>
+            3. Rate: $225 \div 60 = 3.75$.<br>
+            <span class="calc-steps"><span class="key">225</span> <span class="key">÷</span> <span class="key">60</span> <span class="key">=</span></span><br>
+            Result: <strong>3.75 vehicles per minute</strong>
+        </div>
+    </div>
+
+    <div style="margin-top:30px; text-align:center;">
+        <button onclick="generateReport()" style="background:#f1c40f; color:#2c3e50; font-weight:bold; border:2px solid #2c3e50;">GENERATE MY REPORT 📸</button>
+    </div>
+    
+    <div id="final-report" class="report-card">
+        <div class="report-title">PART 1: STUDENT REPORT</div>
+        
+        <div class="skill-row">
+            <span class="skill-name">Percentages (Q1, Q2, Q5)</span>
+            <span id="score-pct">0/3</span>
+        </div>
+        <div class="skill-row">
+            <span class="skill-name">Rates & Data (Q3, Q4, Q8)</span>
+            <span id="score-rates">0/3</span>
+        </div>
+        <div class="skill-row">
+            <span class="skill-name">Ratios & Fractions (Q6, Q7)</span>
+            <span id="score-ratio">0/2</span>
+        </div>
+        
+        <div class="final-score" id="total-score">0 / 8</div>
+        <div id="teacher-feedback" style="text-align:center; font-weight:bold; color: #fff;"></div>
+        <div class="teacher-note">Take a screenshot of this box and send it to your teacher.</div>
+    </div>
+    
+</div>
+
+<div class="nav-buttons">
+    <button class="btn-outline" id="prev-btn" onclick="moveCard(-1)" style="display:none;">Previous</button>
+    <button id="next-btn" onclick="moveCard(1)" style="display:none;">Next Question</button>
+</div>
+
+<script>
+    let currentCard = 0;
+    const totalCards = 9; // Cards 0 to 8
+    
+    // Track attempts
+    let attempts = {};
+    // Track homework scores (1 = correct, 0 = fail)
+    let hwScores = {
+        'hw1': 0, 'hw2': 0, 'hw3': 0, 'hw4': 0, 
+        'hw5': 0, 'hw6': 0, 'hw7': 0, 'hw8': 0
+    };
+
+    function moveCard(direction) {
+        document.getElementById(`card-${currentCard}`).classList.remove('active');
+        currentCard += direction;
+        
+        if(currentCard >= totalCards) currentCard = totalCards - 1;
+        if(currentCard < 0) currentCard = 0;
+
+        document.getElementById(`card-${currentCard}`).classList.add('active');
+        
+        // Update Progress
+        const pct = (currentCard / (totalCards - 1)) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+
+        // Button Visibility
+        document.getElementById('prev-btn').style.display = currentCard > 0 ? 'block' : 'none';
+        
+        if (currentCard === 8) {
+             document.getElementById('next-btn').style.display = 'none';
+        } else {
+             document.getElementById('next-btn').style.display = 'none'; 
+        }
+    }
+
+    function nextCard(cardNum) {
+        document.getElementById(`card-${currentCard}`).classList.remove('active');
+        currentCard = cardNum;
+        document.getElementById(`card-${currentCard}`).classList.add('active');
+        
+        const pct = (currentCard / (totalCards - 1)) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+        
+        document.getElementById('prev-btn').style.display = 'block';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function checkAnswer(id, correctVal, part = null) {
+        let key = part ? `${id}${part}` : `${id}`;
+        let inputId = part ? `ans-${id}${part}` : `ans-${id}`;
+        let fbId = part ? `fb-${id}${part}` : `fb-${id}`;
+        let solId = part ? `sol-${id}${part}` : `sol-${id}`;
+        
+        let userVal = parseFloat(document.getElementById(inputId).value.replace(/,/g, ''));
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        if (Math.abs(userVal - correctVal) < 0.2) {
+            // Correct Logic
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            solution.style.display = "none";
+            
+            // Log HW Score
+            if (id.toString().startsWith('hw')) {
+                hwScores[id] = 1; 
+            }
+            
+            // Next Button Logic
+            if (!id.toString().startsWith('hw')) {
+                if(id === 4 && part === 'a') {
+                    document.getElementById('part-b-4').style.display = 'block';
+                } else if(id === 5 && part === 'a') {
+                    document.getElementById('part-b-5').style.display = 'block';
+                } else {
+                    document.getElementById('next-btn').style.display = 'block';
+                }
+            }
+        } else {
+            // Incorrect Logic
+            if (attempts[key] < 3) {
+                feedback.innerHTML = `❌ Try again (${attempts[key]}/3). Check your calculator.`;
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+            } else {
+                feedback.innerHTML = "❌ 3 Attempts used. See the solution below.";
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+                solution.style.display = "block";
+                
+                // Log HW Score as 0 (Failed)
+                if (id.toString().startsWith('hw')) {
+                    hwScores[id] = 0; 
+                }
+
+                if (!id.toString().startsWith('hw')) {
+                    if(id === 4 && part === 'a') {
+                        document.getElementById('part-b-4').style.display = 'block';
+                    } else if(id === 5 && part === 'a') {
+                        document.getElementById('part-b-5').style.display = 'block';
+                    } else {
+                        document.getElementById('next-btn').style.display = 'block';
+                    }
+                }
+            }
+        }
+    }
+
+    function checkClaim(id, isCorrect) {
+        let fbId = `fb-${id}b`;
+        let feedback = document.getElementById(fbId);
+        if (isCorrect) {
+            feedback.innerHTML = "✅ Correct! 60% > 55%.";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            document.getElementById('next-btn').style.display = 'block';
+        } else {
+            feedback.innerHTML = "❌ Incorrect.";
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+        }
+    }
+
+    function generateReport() {
+        // Calculate Scores
+        let pctScore = hwScores['hw1'] + hwScores['hw2'] + hwScores['hw5'];
+        let rateScore = hwScores['hw3'] + hwScores['hw4'] + hwScores['hw8'];
+        let ratioScore = hwScores['hw6'] + hwScores['hw7'];
+        let total = pctScore + rateScore + ratioScore;
+
+        // Update DOM
+        document.getElementById('score-pct').innerText = pctScore + "/3";
+        document.getElementById('score-rates').innerText = rateScore + "/3";
+        document.getElementById('score-ratio').innerText = ratioScore + "/2";
+        document.getElementById('total-score').innerText = total + " / 8";
+
+        // Generate Feedback Text
+        let msg = "";
+        if (total === 8) msg = "🌟 Outstanding! You are ready for the exam.";
+        else if (total >= 5) msg = "👍 Good job. Review your mistakes.";
+        else msg = "⚠️ Keep practicing. Ask your teacher for help with Ratios/Rates.";
+        
+        document.getElementById('teacher-feedback').innerText = msg;
+
+        // Show Report
+        document.getElementById('final-report').style.display = 'block';
+        document.getElementById('final-report').scrollIntoView({behavior: "smooth"});
+    }
+</script>
+
+</body>
+</html>

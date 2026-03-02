@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAA Numeracy: Financial Literacy</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+            --bg: #f4f6f7;
+            --card-bg: #ffffff;
+            --calc-color: #2980b9;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--primary); padding: 20px; max-width: 900px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary); margin: 0; }
+        .header p { color: #7f8c8d; }
+        
+        .calc-badge {
+            background: var(--calc-color); color: white; padding: 5px 12px; border-radius: 20px; 
+            font-size: 0.9rem; font-weight: bold; display: inline-block; margin-top: 5px;
+        }
+
+        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s; }
+
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: none; animation: fadeIn 0.5s; }
+        .card.active { display: block; }
+
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+        .context-box { background: #eaf2f8; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 15px; font-style: italic; }
+
+        input[type="number"], input[type="text"] { padding: 10px; font-size: 1rem; border: 2px solid #bdc3c7; border-radius: 6px; width: 140px; }
+        button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        
+        .feedback { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; }
+        
+        .solution-box {
+            display: none; margin-top: 15px; background: #fff3e0; border: 1px solid #d35400; 
+            padding: 15px; border-radius: 8px; color: #d35400;
+        }
+        .calc-steps { font-family: monospace; background: #fff; padding: 5px 10px; border-radius: 4px; border: 1px solid #ccc; display: inline-block; margin-top: 5px; }
+        .key { border: 1px solid #999; padding: 2px 6px; border-radius: 4px; background: #eee; box-shadow: 0 2px 0 #999; font-size: 0.9em; }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        
+        .hw-item { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .hw-item:last-child { border-bottom: none; }
+        .hw-label { font-weight:bold; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px; display:block; }
+
+        .finance-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.95rem; }
+        .finance-table th { background: #34495e; color: white; padding: 10px; text-align: left; }
+        .finance-table td { border-bottom: 1px solid #ddd; padding: 10px; }
+        .money-col { text-align: right; font-family: monospace; font-weight: bold; }
+
+        .report-card { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-top: 30px; border: 4px solid #f1c40f; display:none; }
+        .report-title { text-align: center; border-bottom: 1px solid #7f8c8d; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; font-weight: bold; }
+        .skill-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .final-score { text-align: center; font-size: 2rem; margin: 20px 0; font-weight: bold; color: #f1c40f; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CAA Numeracy Prep</h1>
+    <p>Part 3: Number Strategies & Finance</p>
+    <div class="calc-badge">🖩 Calculator Allowed</div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="card active" id="card-0">
+    <h2>💰 Welcome to Finance</h2>
+    <p>This module covers key skills for the exam:</p>
+    <ul>
+        <li><strong>Integers:</strong> Negative numbers (Temperature, Debt).</li>
+        <li><strong>BODMAS:</strong> Order of operations in money.</li>
+        <li><strong>Estimation:</strong> Rounding to check costs.</li>
+        <li><strong>Best Buy:</strong> Comparing value.</li>
+        <li><strong>Exchange Rates:</strong> Converting currency.</li>
+    </ul>
+    <div style="text-align:center;">
+        <button onclick="nextCard(1)">Start Training</button>
+    </div>
+</div>
+
+<div class="card" id="card-1">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e74c3c; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">1. Integers</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Addition</span>
+    </div>
+    <div class="question-text">Positive & Negative Numbers</div>
+    <div class="context-box">
+        In cricket: Gain runs (+), Lose wickets (-5 pts).
+    </div>
+    <p><strong>Question:</strong> A team starts on <strong>-5 points</strong>. They score <strong>20 runs</strong>.</p>
+    <input type="number" id="ans-1" placeholder="Points">
+    <button onclick="checkAnswer(1, 15)">Check</button>
+    <div class="feedback" id="fb-1"></div>
+    <div class="solution-box" id="sol-1">
+        <strong>Solution:</strong><br>
+        Why? Start at -5 and move UP 20.<br>
+        $-5 + 20 = 15$.
+    </div>
+</div>
+
+<div class="card" id="card-2">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e74c3c; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">2. Negative Rates</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Multiplication</span>
+    </div>
+    <div class="question-text">Repeated Drops</div>
+    <div class="context-box">
+        <strong>Context:</strong> Bank Fees.<br>
+        Your account is overdrawn. The bank charges a <strong>$10 late fee</strong> every day.
+    </div>
+    <p>What is the total change in your account balance after <strong>5 days</strong>?</p>
+    <input type="number" id="ans-2" placeholder="$">
+    <button onclick="checkAnswer(2, -50)">Check</button>
+    <div class="feedback" id="fb-2"></div>
+    <div class="solution-box" id="sol-2">
+        <strong>Solution:</strong><br>
+        Why? 5 days $\times$ (-10 dollars).<br>
+        $5 \times -10 = -50$ dollars.
+    </div>
+</div>
+
+<div class="card" id="card-3">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#2ecc71; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">3. Costing (BODMAS)</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Order of Ops</span>
+    </div>
+    <div class="question-text">Family Movie Trip</div>
+    <div class="context-box">
+        • Adult Ticket: $18<br>
+        • Child Ticket: $12<br>
+        • Booking Fee: $5 (Fixed per order)
+    </div>
+    <p>You buy <strong>2 Adult</strong> tickets and <strong>3 Child</strong> tickets plus the fee. Total cost?</p>
+    <input type="number" id="ans-3" placeholder="$">
+    <button onclick="checkAnswer(3, 77)">Check</button>
+    <div class="feedback" id="fb-3"></div>
+    <div class="solution-box" id="sol-3">
+        <strong>Solution:</strong><br>
+        Why? Multiply first (BODMAS).<br>
+        $(2 \times 18) + (3 \times 12) + 5$<br>
+        $36 + 36 + 5 = \$77$.
+    </div>
+</div>
+
+<div class="card" id="card-4">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#f39c12; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">4. Estimation</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Rounding</span>
+    </div>
+    <div class="question-text">Supermarket Check</div>
+    <div class="context-box">
+        You have $10 cash. You want to buy:<br>
+        • Bread: $2.90<br>
+        • Milk: $3.10<br>
+        • Apples: $4.80
+    </div>
+    <p>Estimate the total cost by rounding each item to the nearest dollar.</p>
+    <input type="number" id="ans-4" placeholder="$">
+    <button onclick="checkAnswer(4, 11)">Check</button>
+    <div class="feedback" id="fb-4"></div>
+    <div class="solution-box" id="sol-4">
+        <strong>Solution:</strong><br>
+        $2.90 \rightarrow 3$. $3.10 \rightarrow 3$. $4.80 \rightarrow 5$.<br>
+        $3 + 3 + 5 = \$11$. (You don't have enough money!)
+    </div>
+</div>
+
+<div class="card" id="card-5">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#8e44ad; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">5. Best Buy</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Compare</span>
+    </div>
+    <div class="question-text">Comparing Value</div>
+    <div class="context-box">
+        • Small Bottle: 1.5 Litres for $3.00<br>
+        • Large Bottle: 2.0 Litres for $3.50
+    </div>
+    <p>Calculate the cost per Litre for the <strong>Large Bottle</strong>.</p>
+    <input type="number" id="ans-5" placeholder="$">
+    <button onclick="checkAnswer(5, 1.75)">Check</button>
+    <div class="feedback" id="fb-5"></div>
+    <div class="solution-box" id="sol-5">
+        <strong>Solution:</strong><br>
+        Price $\div$ Amount.<br>
+        $3.50 \div 2 = \$1.75$ per Litre.<br>
+        (Small bottle is $3 \div 1.5 = \$2.00$/L, so Large is better).
+    </div>
+</div>
+
+<div class="card" id="card-6">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#2c3e50; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">6. Exchange Rates</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Conversion</span>
+    </div>
+    <div class="question-text">Holiday Money</div>
+    <div class="context-box">
+        <strong>Exchange Rate:</strong> 1 NZD = 0.90 AUD.
+    </div>
+    <p>You exchange <strong>$200 NZD</strong>. How many <strong>Australian Dollars (AUD)</strong> do you get?</p>
+    <input type="number" id="ans-6" placeholder="AUD">
+    <button onclick="checkAnswer(6, 180)">Check</button>
+    <div class="feedback" id="fb-6"></div>
+    <div class="solution-box" id="sol-6">
+        <strong>Solution:</strong><br>
+        Multiply NZD by the rate.<br>
+        $200 \times 0.90 = \$180$ AUD.
+    </div>
+</div>
+
+<div class="card" id="card-7">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#f1c40f; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">7. Budgeting</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Review</span>
+    </div>
+    <div class="question-text">Weekly Expenses</div>
+    <table class="finance-table">
+        <tr><th>Item</th><th>Amount</th></tr>
+        <tr><td>Wages</td><td class="money-col">+$600.00</td></tr>
+        <tr><td>Rent</td><td class="money-col">-$220.00</td></tr>
+        <tr><td>Food</td><td class="money-col">-$150.00</td></tr>
+    </table>
+    <p>Calculate the <strong>Surplus</strong> (Money left over).</p>
+    <input type="number" id="ans-7" placeholder="$">
+    <button onclick="checkAnswer(7, 230)">Check</button>
+    <div class="feedback" id="fb-7"></div>
+    <div class="solution-box" id="sol-7">
+        <strong>Solution:</strong><br>
+        $600 - 220 - 150 = \$230$.
+    </div>
+</div>
+
+<div class="card" id="card-8">
+    <h2>🎉 Training Complete!</h2>
+    <p>Complete this set of real-world exam questions.</p>
+    
+    <div class="hw-item">
+        <span class="hw-label">HW Q1: Indoor Cricket (Add/Sub)</span>
+        <div class="question-text">
+            A team is on <strong>-10 points</strong>.<br>
+            They get <strong>30 more runs</strong> (+30) but lose another <strong>5 wickets</strong> (-5 pts each).
+        </div>
+        <p>Calculate the final score.</p>
+        <input type="number" id="ans-hw1" placeholder="Score">
+        <button onclick="checkAnswer('hw1', -5)">Check</button>
+        <div class="feedback" id="fb-hw1"></div>
+        <div class="solution-box" id="sol-hw1">
+            <strong>Solution:</strong><br>
+            Wickets lost: $5 \times 5 = 25$ points lost (-25).<br>
+            $-10 + 30 - 25 = -5$.
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q2: Student Budget (2021 Exam)</span>
+        <div class="question-text">
+            Income: <strong>$450</strong>.<br>
+            Expenses: Rent $185, Petrol $15, Phone $12.50.
+        </div>
+        
+        <p><strong>A:</strong> Total Expenses?</p>
+        <input type="number" id="ans-hw2" placeholder="$">
+        <button onclick="checkAnswer('hw2', 212.50)">Check</button>
+        <div class="feedback" id="fb-hw2"></div>
+        <div class="solution-box" id="sol-hw2">
+            <strong>Solution:</strong> $185 + 15 + 12.50 = \$212.50$.
+        </div>
+
+        <div style="margin-top:15px; border-top:1px dashed #ccc; padding-top:10px;">
+            <p><strong>B:</strong> The student needs to save <strong>$240</strong>. Is there enough left over?</p>
+            <button class="btn-outline" onclick="checkBoolean('hw2b', 1)">Yes</button>
+            <button class="btn-outline" onclick="checkBoolean('hw2b', 0)">No</button>
+            <div class="feedback" id="fb-hw2b"></div>
+            <div class="solution-box" id="sol-hw2b">
+                <strong>Solution:</strong><br>
+                Leftover: $450 - 212.50 = \$237.50$.<br>
+                They need $240. So <strong>No</strong>, they are short by $2.50.
+            </div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q3: Gardening (BODMAS)</span>
+        <div class="question-text">
+            You buy <strong>4 plants</strong> costing <strong>$15 each</strong>.<br>
+            The delivery fee is <strong>$40</strong>.
+        </div>
+        <p>Calculate the total cost.</p>
+        <input type="number" id="ans-hw3" placeholder="$">
+        <button onclick="checkAnswer('hw3', 100)">Check</button>
+        <div class="feedback" id="fb-hw3"></div>
+        <div class="solution-box" id="sol-hw3">
+            <strong>Solution:</strong><br>
+            Multiply first: $4 \times 15 = 60$.<br>
+            Add delivery: $60 + 40 = \$100$.
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q4: Temperature Change (Integers)</span>
+        <div class="question-text">
+            At 6:00 pm the temperature is <strong>0°C</strong>.<br>
+            It drops by <strong>3°C per hour</strong> for 4 hours.
+        </div>
+        <p>What is the temperature at 10:00 pm?</p>
+        <input type="number" id="ans-hw4" placeholder="°C">
+        <button onclick="checkAnswer('hw4', -12)">Check</button>
+        <div class="feedback" id="fb-hw4"></div>
+        <div class="solution-box" id="sol-hw4">
+            <strong>Solution:</strong><br>
+            Drop: $4 \text{ hours} \times -3 = -12$.<br>
+            Start 0 + (-12) = -12°C.
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q5: Building Cost (Estimation)</span>
+        <div class="question-text">
+            You need <strong>49.5 metres</strong> of timber.<br>
+            The cost is <strong>$9.90 per metre</strong>.
+        </div>
+        <p>Estimate the total cost by rounding numbers to the nearest whole number.</p>
+        <input type="number" id="ans-hw5" placeholder="$">
+        <button onclick="checkAnswer('hw5', 500)">Check</button>
+        <div class="feedback" id="fb-hw5"></div>
+        <div class="solution-box" id="sol-hw5">
+            <strong>Solution:</strong><br>
+            $49.5 \approx 50$. $9.90 \approx 10$.<br>
+            $50 \times 10 = \$500$.
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q6: Laundry Powder (Best Buy)</span>
+        <div class="question-text">
+            • <strong>Option A:</strong> 500g for $4.00<br>
+            • <strong>Option B:</strong> 1.2 kg (1200g) for $9.00
+        </div>
+        <p>Calculate the cost per 100g for <strong>Option A</strong>.</p>
+        <input type="number" id="ans-hw6" placeholder="$">
+        <button onclick="checkAnswer('hw6', 0.80)">Check</button>
+        <div class="feedback" id="fb-hw6"></div>
+        <div class="solution-box" id="sol-hw6">
+            <strong>Solution:</strong><br>
+            $4.00 \div 5 = \$0.80$ per 100g.
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q7: Online Shopping (Exchange)</span>
+        <div class="question-text">
+            You buy sneakers online for <strong>$120 USD</strong>.<br>
+            The exchange rate is <strong>1 NZD = 0.60 USD</strong>.
+        </div>
+        <p>How much does this cost in <strong>NZD</strong>?</p>
+        <p><em>(Hint: Divide USD by the rate to get NZD)</em></p>
+        <input type="number" id="ans-hw7" placeholder="NZD">
+        <button onclick="checkAnswer('hw7', 200)">Check</button>
+        <div class="feedback" id="fb-hw7"></div>
+        <div class="solution-box" id="sol-hw7">
+            <strong>Solution:</strong><br>
+            $120 \div 0.60 = \$200$ NZD.
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q8: Candle Profit (2024 Exam)</span>
+        <div class="question-text">
+            Sales Revenue: <strong>$277.20</strong>.<br>
+            Costs: <strong>$150.00</strong>.
+        </div>
+        <p>Calculate the Profit.</p>
+        <input type="number" id="ans-hw8" placeholder="$">
+        <button onclick="checkAnswer('hw8', 127.20)">Check</button>
+        <div class="feedback" id="fb-hw8"></div>
+        <div class="solution-box" id="sol-hw8">
+            <strong>Solution:</strong> $277.20 - 150 = \$127.20$.
+        </div>
+    </div>
+
+    <div style="margin-top:30px; text-align:center;">
+        <button onclick="generateReport()" style="background:#f1c40f; color:#2c3e50; font-weight:bold; border:2px solid #2c3e50;">GENERATE MY REPORT 📸</button>
+    </div>
+    
+    <div id="final-report" class="report-card">
+        <div class="report-title">PART 3: FINANCE REPORT</div>
+        
+        <div class="skill-row">
+            <span class="skill-name">Integers & BODMAS (Q1, Q3, Q4)</span>
+            <span id="score-int">0/3</span>
+        </div>
+        <div class="skill-row">
+            <span class="skill-name">Budgeting & Profit (Q2, Q8)</span>
+            <span id="score-bud">0/3</span>
+        </div>
+        <div class="skill-row">
+            <span class="skill-name">Value & Exchange (Q5, Q6, Q7)</span>
+            <span id="score-val">0/3</span>
+        </div>
+        
+        <div class="final-score" id="total-score">0 / 9</div>
+        <div id="teacher-feedback" style="text-align:center; font-weight:bold; color: #fff;"></div>
+        <div class="teacher-note">Take a screenshot of this box and send it to your teacher.</div>
+    </div>
+    
+</div>
+
+<div class="nav-buttons">
+    <button class="btn-outline" id="prev-btn" onclick="moveCard(-1)" style="display:none;">Previous</button>
+    <button id="next-btn" onclick="moveCard(1)" style="display:none;">Next Question</button>
+</div>
+
+<script>
+    let currentCard = 0;
+    const totalCards = 9; // Cards 0 to 8
+    
+    let attempts = {};
+    let hwScores = {
+        'hw1': 0, 'hw2': 0, 'hw2b': 0, 'hw3': 0, 
+        'hw4': 0, 'hw5': 0, 'hw6': 0, 'hw7': 0, 'hw8': 0
+    };
+
+    function moveCard(direction) {
+        document.getElementById(`card-${currentCard}`).classList.remove('active');
+        currentCard += direction;
+        
+        if(currentCard >= totalCards) currentCard = totalCards - 1;
+        if(currentCard < 0) currentCard = 0;
+
+        document.getElementById(`card-${currentCard}`).classList.add('active');
+        
+        const pct = (currentCard / (totalCards - 1)) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+
+        document.getElementById('prev-btn').style.display = currentCard > 0 ? 'block' : 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function nextCard(cardNum) {
+        moveCard(cardNum - currentCard);
+    }
+
+    function checkAnswer(id, correctVal, part = null) {
+        let key = part ? `${id}${part}` : `${id}`;
+        let inputId = `ans-${key}`;
+        let fbId = `fb-${key}`;
+        let solId = `sol-${key}`;
+        
+        let userVal = parseFloat(document.getElementById(inputId).value.replace(/,/g, ''));
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        if (Math.abs(userVal - correctVal) < 0.01) {
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "none";
+            
+            if (id.toString().startsWith('hw')) {
+                hwScores[key] = 1;
+            } else {
+                handleNext(id, part);
+            }
+        } else {
+            handleWrong(key, feedback, solution, id, part);
+        }
+    }
+
+    // New Function for Button-based Questions (Yes/No)
+    function checkBoolean(key, isCorrectChoice) {
+        let fbId = `fb-${key}`;
+        let solId = `sol-${key}`;
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        // If 'isCorrectChoice' passed is 0 (No) for HW2b, it means user clicked No.
+        // For HW2b, No (0) is the correct answer.
+        // Wait, logic check:
+        // Button "No" calls checkBoolean('hw2b', 0).
+        // Correct answer is "No". So if user clicked "No" (0), they are correct.
+        
+        if (isCorrectChoice === 0) { // 0 represents Correct Choice here for HW2b
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            solution.style.display = "none";
+            hwScores[key] = 1;
+        } else {
+            feedback.innerHTML = "❌ Incorrect.";
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+            solution.style.display = "block";
+            hwScores[key] = 0;
+        }
+    }
+
+    function handleWrong(key, feedback, solution, id, part) {
+        if (attempts[key] < 3) {
+            feedback.innerHTML = `❌ Try again (${attempts[key]}/3).`;
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+        } else {
+            feedback.innerHTML = "❌ 3 Attempts used. See solution.";
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "block";
+            
+            if (id.toString().startsWith('hw')) hwScores[key] = 0;
+            else handleNext(id, part);
+        }
+    }
+
+    function handleNext(id, part) {
+        if(id===1 && part==='a') document.getElementById('part-b-1').style.display = 'block';
+        else if(id===2 && part==='a') document.getElementById('part-b-2').style.display = 'block';
+        else if(id===3 && part==='a') document.getElementById('part-b-3').style.display = 'block';
+        else if(id===4 && part==='a') document.getElementById('part-b-4').style.display = 'block';
+        else document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function generateReport() {
+        let i = hwScores['hw1'] + hwScores['hw3'] + hwScores['hw4'];
+        let b = hwScores['hw2'] + hwScores['hw2b'] + hwScores['hw8'];
+        let v = hwScores['hw5'] + hwScores['hw6'] + hwScores['hw7'];
+        let total = i + b + v;
+
+        document.getElementById('score-int').innerText = i + "/3";
+        document.getElementById('score-bud').innerText = b + "/3";
+        document.getElementById('score-val').innerText = v + "/3";
+        document.getElementById('total-score').innerText = total + " / 9";
+
+        let msg = "";
+        if (total === 9) msg = "🌟 Financial Master! Perfect Score.";
+        else if (total >= 6) msg = "👍 Good work. Review your weak areas.";
+        else msg = "⚠️ Focus on calculations.";
+        
+        document.getElementById('teacher-feedback').innerText = msg;
+        document.getElementById('final-report').style.display = 'block';
+        document.getElementById('final-report').scrollIntoView({behavior: "smooth"});
+    }
+</script>
+
+</body>
+</html>

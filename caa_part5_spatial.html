@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAA Numeracy: Spatial Reasoning</title>
+    
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --success: #27ae60;
+            --error: #c0392b;
+            --bg: #f4f6f7;
+            --card-bg: #ffffff;
+            --calc-color: #9b59b6;
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--primary); padding: 20px; max-width: 900px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 30px; }
+        .header h1 { color: var(--primary); margin: 0; }
+        .header p { color: #7f8c8d; }
+        
+        .calc-badge {
+            background: var(--calc-color); color: white; padding: 5px 12px; border-radius: 20px; 
+            font-size: 0.9rem; font-weight: bold; display: inline-block; margin-top: 5px;
+        }
+
+        .progress-bar { height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.5s; }
+
+        .card { background: var(--card-bg); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 25px; display: none; animation: fadeIn 0.5s; }
+        .card.active { display: block; }
+
+        .question-text { font-size: 1.2rem; font-weight: 600; margin-bottom: 15px; }
+        .context-box { background: #eaf2f8; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 15px; font-style: italic; }
+
+        input[type="number"], input[type="text"] { padding: 10px; font-size: 1rem; border: 2px solid #bdc3c7; border-radius: 6px; width: 140px; }
+        button { padding: 10px 20px; font-size: 1rem; border: none; border-radius: 6px; cursor: pointer; background: var(--primary); color: white; transition: 0.2s; }
+        button:hover { opacity: 0.9; transform: translateY(-1px); }
+        button:disabled { background: #95a5a6; cursor: not-allowed; opacity: 0.7; transform: none; }
+        
+        .btn-outline { background: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .btn-outline:hover { background: var(--primary); color: white; }
+        
+        .feedback { margin-top: 15px; font-weight: bold; padding: 10px; border-radius: 6px; display: none; }
+        .feedback.correct { background: #d4edda; color: #155724; }
+        .feedback.wrong { background: #f8d7da; color: #721c24; }
+        
+        .solution-box {
+            display: none; margin-top: 15px; background: #fff3e0; border: 1px solid #d35400; 
+            padding: 15px; border-radius: 8px; color: #d35400;
+        }
+
+        .nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; }
+        
+        .hw-item { border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }
+        .hw-item:last-child { border-bottom: none; }
+        .hw-label { font-weight:bold; color:#7f8c8d; font-size:0.9rem; margin-bottom:5px; display:block; }
+
+        .report-card { background: #2c3e50; color: white; padding: 20px; border-radius: 8px; margin-top: 30px; border: 4px solid #f1c40f; display:none; }
+        .report-title { text-align: center; border-bottom: 1px solid #7f8c8d; padding-bottom: 10px; margin-bottom: 15px; font-size: 1.5rem; font-weight: bold; }
+        .skill-row { display: flex; justify-content: space-between; margin-bottom: 10px; padding: 5px; background: rgba(255,255,255,0.1); border-radius: 4px; }
+        .final-score { text-align: center; font-size: 2rem; margin: 20px 0; font-weight: bold; color: #f1c40f; }
+        
+        .graph-container { text-align: center; margin: 15px 0; background: #fff; border: 1px dashed #ccc; padding: 10px; border-radius: 8px; overflow-x: auto; }
+        svg text { font-size: 14px; fill: #333; font-family: sans-serif; font-weight: bold; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>CAA Numeracy Prep</h1>
+    <p>Part 5: Spatial Reasoning</p>
+    <div class="calc-badge">🖩 Calculator Allowed</div>
+</div>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="card active" id="card-0">
+    <h2>🧊 Shapes & Space</h2>
+    <p>This module helps you visualize objects in 3D space:</p>
+    <ul>
+        <li><strong>Views:</strong> Top, Front, Side views of blocks.</li>
+        <li><strong>Nets:</strong> Folding flat paper into 3D boxes.</li>
+        <li><strong>Transformations:</strong> Rotation (Turn) and Reflection (Flip).</li>
+        <li><strong>Logic:</strong> Stacking dice rules.</li>
+    </ul>
+    <div style="text-align:center;">
+        <button onclick="nextCard(1)">Start Training</button>
+    </div>
+</div>
+
+<div class="card" id="card-1">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#3498db; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">1. 3D Views</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Perspective</span>
+    </div>
+    <div class="question-text">Block Tower</div>
+    <div class="graph-container">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+            <rect x="50" y="100" width="50" height="50" fill="#3498db" stroke="white"/>
+            <text x="65" y="130" fill="white">A</text>
+            <rect x="100" y="100" width="50" height="50" fill="#3498db" stroke="white"/>
+            <text x="115" y="130" fill="white">B</text>
+            <rect x="75" y="50" width="50" height="50" fill="#e74c3c" stroke="white"/>
+            <text x="90" y="80" fill="white">C</text>
+            
+            <text x="160" y="125">Front</text>
+            <line x1="155" y1="125" x2="140" y2="125" stroke="black" marker-end="url(#arrow)"/>
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> How many blocks are in the bottom row?</p>
+    <input type="number" id="ans-1a" placeholder="Blocks">
+    <button id="btn-1a" onclick="checkAnswer(1, 2, 'a')">Check</button>
+    <div class="feedback" id="fb-1a"></div>
+    <div class="solution-box" id="sol-1a"><strong>Solution:</strong> Blocks A and B are on the bottom. Answer: 2.</div>
+
+    <div id="part-b-1" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> Looking from the <strong>Top</strong>, how many blocks do you see?</p>
+        <input type="number" id="ans-1b" placeholder="Blocks">
+        <button id="btn-1b" onclick="checkAnswer(1, 3, 'b')">Check</button>
+        <div class="feedback" id="fb-1b"></div>
+        <div class="solution-box" id="sol-1b"><strong>Solution:</strong> From above, you see block C in the middle, and the edges of A and B sticking out. Total blocks visible = 3.</div>
+    </div>
+
+    <div id="part-c-1" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> Looking from the <strong>Side</strong> (Right), how many blocks high is the tower?</p>
+        <input type="number" id="ans-1c" placeholder="Height">
+        <button id="btn-1c" onclick="checkAnswer(1, 2, 'c')">Check</button>
+        <div class="feedback" id="fb-1c"></div>
+        <div class="solution-box" id="sol-1c"><strong>Solution:</strong> There is a bottom row and a top row. Height = 2.</div>
+    </div>
+</div>
+
+<div class="card" id="card-2">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#e67e22; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">2. Nets</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Folding</span>
+    </div>
+    <div class="question-text">Which Net makes a Cube?</div>
+    <div class="graph-container">
+        <svg width="300" height="150" viewBox="0 0 300 150">
+            <g transform="translate(20,20)">
+                <rect x="30" y="0" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="30" y="30" width="30" height="30" fill="#ddd" stroke="black"/> <text x="35" y="50" font-size="10">Base</text>
+                <rect x="30" y="60" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="30" y="90" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="0" y="30" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="60" y="30" width="30" height="30" fill="none" stroke="black"/>
+                <text x="80" y="20" fill="black" font-weight="bold">A</text>
+            </g>
+            <g transform="translate(150,40)">
+                <rect x="0" y="0" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="30" y="0" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="60" y="0" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="90" y="0" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="120" y="0" width="30" height="30" fill="none" stroke="black"/>
+                <rect x="150" y="0" width="30" height="30" fill="none" stroke="black"/>
+                <text x="170" y="50" fill="black" font-weight="bold">B</text>
+            </g>
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> Which shape (A or B) folds into a cube?</p>
+    <button class="btn-outline" id="btn-2a-A" onclick="checkChoice('2a', 'A')">A</button>
+    <button class="btn-outline" id="btn-2a-B" onclick="checkChoice('2a', 'B')">B</button>
+    <div class="feedback" id="fb-2a"></div>
+    <div class="solution-box" id="sol-2a"><strong>Solution:</strong> A is a standard net. B is just a long strip that would overlap.</div>
+
+    <div id="part-b-2" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> In Net A, the shaded square is the Base. Which part becomes the <strong>Top</strong> (Lid)?</p>
+        <button class="btn-outline" id="btn-2b-bot" onclick="checkChoice('2b', 'Bottom')">Bottom Square</button>
+        <button class="btn-outline" id="btn-2b-top" onclick="checkChoice('2b', 'Top')">Top Square</button>
+        <div class="feedback" id="fb-2b"></div>
+        <div class="solution-box" id="sol-2b"><strong>Solution:</strong> The lid is always 2 squares away from the base. That is the bottom-most square.</div>
+    </div>
+
+    <div id="part-c-2" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> If the Base is number 1, what number must be on the Top face (using standard dice rules)?</p>
+        <input type="number" id="ans-2c" placeholder="#">
+        <button id="btn-2c" onclick="checkAnswer(2, 6, 'c')">Check</button>
+        <div class="feedback" id="fb-2c"></div>
+        <div class="solution-box" id="sol-2c"><strong>Solution:</strong> Opposite sides add to 7. $7 - 1 = 6$.</div>
+    </div>
+</div>
+
+<div class="card" id="card-3">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#9b59b6; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">3. Transformations</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Movements</span>
+    </div>
+    <div class="question-text">Moving Shapes</div>
+    <div class="graph-container">
+        <svg width="350" height="150" viewBox="0 0 350 150">
+            <path d="M20,20 L50,20 L20,50 Z" fill="#2980b9" stroke="black"/>
+            <text x="10" y="80" font-size="12">Original</text>
+            
+            <path d="M120,20 L90,20 L120,50 Z" fill="#e74c3c" stroke="black"/>
+            <text x="80" y="80" font-size="12">Shape X</text>
+            
+            <path d="M200,50 L200,20 L230,50 Z" fill="#f1c40f" stroke="black"/>
+            <text x="200" y="80" font-size="12">Shape Y</text>
+            
+            <line x1="70" y1="10" x2="70" y2="60" stroke="black" stroke-dasharray="4"/>
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> Comparing Original to Shape X (Red): What happened?</p>
+    <button class="btn-outline" id="btn-3a-ref" onclick="checkChoice('3a', 'Reflect')">Reflection</button>
+    <button class="btn-outline" id="btn-3a-rot" onclick="checkChoice('3a', 'Rotate')">Rotation</button>
+    <div class="feedback" id="fb-3a"></div>
+    <div class="solution-box" id="sol-3a"><strong>Solution:</strong> It is flipped over the dotted line (Mirror).</div>
+
+    <div id="part-b-3" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> Comparing Original to Shape Y (Yellow): What happened?</p>
+        <button class="btn-outline" id="btn-3b-ref" onclick="checkChoice('3b', 'Reflect')">Reflection</button>
+        <button class="btn-outline" id="btn-3b-rot" onclick="checkChoice('3b', 'Rotate')">Rotation</button>
+        <div class="feedback" id="fb-3b"></div>
+        <div class="solution-box" id="sol-3b"><strong>Solution:</strong> It has turned 90 degrees. Rotation.</div>
+    </div>
+
+    <div id="part-c-3" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> If you Translate (Slide) the Original shape to the <strong>Right</strong>, does it change direction?</p>
+        <button class="btn-outline" id="btn-3c-y" onclick="checkChoice('3c', 'No')">No</button>
+        <button class="btn-outline" id="btn-3c-n" onclick="checkChoice('3c', 'Yes')">Yes</button>
+        <div class="feedback" id="fb-3c"></div>
+        <div class="solution-box" id="sol-3c"><strong>Solution:</strong> Translation only moves position, it does not turn or flip.</div>
+    </div>
+</div>
+
+<div class="card" id="card-4">
+    <div style="display:flex; justify-content:space-between;">
+        <span style="background:#27ae60; color:white; padding:3px 8px; border-radius:4px; font-size:0.8rem; font-weight:bold;">4. Dice Logic</span>
+        <span class="calc-badge" style="font-size:0.7rem; padding:2px 8px;">Rules</span>
+    </div>
+    <div class="question-text">Hidden Faces</div>
+    <div class="context-box">
+        <strong>Dice Rule:</strong> Opposite sides of a standard die always add to <strong>7</strong>.<br>
+        <strong>Puzzle Rule:</strong> In this stack, TOUCHING faces also sum to <strong>7</strong>.
+    </div>
+    <div class="graph-container">
+        <svg width="150" height="150" viewBox="0 0 150 150">
+            <rect x="50" y="50" width="50" height="50" fill="white" stroke="black"/>
+            <circle cx="60" cy="60" r="4" fill="black"/> <circle cx="90" cy="60" r="4" fill="black"/>
+            <circle cx="60" cy="90" r="4" fill="black"/> <circle cx="90" cy="90" r="4" fill="black"/>
+            <circle cx="75" cy="75" r="4" fill="black"/>
+            <text x="40" y="120" font-size="12">Top Face = 5</text>
+        </svg>
+    </div>
+    
+    <p><strong>A (Level 1):</strong> What number is on the <strong>Bottom</strong> of this die?</p>
+    <input type="number" id="ans-4a" placeholder="#">
+    <button id="btn-4a" onclick="checkAnswer(4, 2, 'a')">Check</button>
+    <div class="feedback" id="fb-4a"></div>
+    <div class="solution-box" id="sol-4a"><strong>Solution:</strong> $7 - 5 = 2$.</div>
+
+    <div id="part-b-4" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>B (Level 2):</strong> A second die is stacked UNDER this one. Using the <strong>Puzzle Rule</strong> (Touching=7), what is on the <strong>Top</strong> of the bottom die?</p>
+        <input type="number" id="ans-4b" placeholder="#">
+        <button id="btn-4b" onclick="checkAnswer(4, 5, 'b')">Check</button>
+        <div class="feedback" id="fb-4b"></div>
+        <div class="solution-box" id="sol-4b">
+            <strong>Solution:</strong><br>
+            Bottom of Top Die = 2.<br>
+            Touching faces sum to 7. So Top of Bottom Die = $7 - 2 = 5$.
+        </div>
+    </div>
+    
+    <div id="part-c-4" style="display:none; margin-top:15px; border-top:1px dashed #ccc;">
+        <p><strong>C (Level 3):</strong> What is on the very <strong>Bottom</strong> face of the second die?</p>
+        <input type="number" id="ans-4c" placeholder="#">
+        <button id="btn-4c" onclick="checkAnswer(4, 2, 'c')">Check</button>
+        <div class="feedback" id="fb-4c"></div>
+        <div class="solution-box" id="sol-4c">
+            <strong>Solution:</strong><br>
+            Top of 2nd die = 5.<br>
+            Opposite (Bottom) of 2nd die = $7 - 5 = 2$.
+        </div>
+    </div>
+</div>
+
+<div class="card" id="card-5">
+    <h2>🎉 Training Complete!</h2>
+    <p>Complete this comprehensive homework set (3 Levels per Question).</p>
+    
+    <div class="hw-item">
+        <span class="hw-label">HW Q1: T-Shape Net</span>
+        <div class="graph-container">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+                <g transform="translate(20,20)">
+                    <rect x="30" y="0" width="30" height="30" fill="none" stroke="black"/> <rect x="30" y="30" width="30" height="30" fill="#ddd" stroke="black"/> <text x="35" y="50" font-size="8">Base</text>
+                    <rect x="0" y="30" width="30" height="30" fill="none" stroke="black"/> <rect x="60" y="30" width="30" height="30" fill="none" stroke="black"/> <rect x="30" y="60" width="30" height="30" fill="none" stroke="black"/> <rect x="30" y="90" width="30" height="30" fill="none" stroke="black"/> </g>
+            </svg>
+        </div>
+        <p><strong>A:</strong> Does this net fold into a cube?</p>
+        <button class="btn-outline" id="btn-hw1a-y" onclick="checkChoice('hw1a', 'Yes')">Yes</button>
+        <button class="btn-outline" id="btn-hw1a-n" onclick="checkChoice('hw1a', 'No')">No</button>
+        <div class="feedback" id="fb-hw1a"></div>
+        <div class="solution-box" id="sol-hw1a"><strong>Solution:</strong> Yes, it is a valid net.</div>
+
+        <div id="part-hw1b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> Which part becomes the <strong>Lid</strong> (Opposite the Base)?</p>
+            <button class="btn-outline" id="btn-hw1b-1" onclick="checkChoice('hw1b', 'Bottom')">Bottom Most</button>
+            <button class="btn-outline" id="btn-hw1b-2" onclick="checkChoice('hw1b', 'Top')">Top Most</button>
+            <div class="feedback" id="fb-hw1b"></div>
+            <div class="solution-box" id="sol-hw1b"><strong>Solution:</strong> Count 2 squares away from base = Bottom Most square.</div>
+        </div>
+
+        <div id="part-hw1c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> If Base = 3, what is on the Lid?</p>
+            <input type="number" id="ans-hw1c" placeholder="#">
+            <button id="btn-hw1c" onclick="checkAnswer('hw1', 4, 'c')">Check</button>
+            <div class="feedback" id="fb-hw1c"></div>
+            <div class="solution-box" id="sol-hw1c"><strong>Solution:</strong> $7 - 3 = 4$.</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q2: Arrow Rotation</span>
+        <div class="graph-container">
+            <svg width="200" height="150" viewBox="0 0 200 150">
+                <path d="M40,50 L40,20 L30,20 L50,0 L70,20 L60,20 L60,50 Z" fill="#3498db" stroke="black"/>
+                <text x="30" y="70">Start</text>
+                
+                <path d="M120,30 L150,30 L150,20 L170,40 L150,60 L150,50 L120,50 Z" fill="#e74c3c" stroke="black"/>
+                <text x="130" y="70">End</text>
+                
+                <path d="M70,10 Q95,5 110,15" fill="none" stroke="black" stroke-dasharray="4" marker-end="url(#arrow)"/>
+            </svg>
+        </div>
+        <p><strong>A:</strong> The blue arrow rotates to the red arrow. How many degrees?</p>
+        <button class="btn-outline" id="btn-hw2a-90" onclick="checkChoice('hw2a', '90')">90°</button>
+        <button class="btn-outline" id="btn-hw2a-180" onclick="checkChoice('hw2a', '180')">180°</button>
+        <div class="feedback" id="fb-hw2a"></div>
+        <div class="solution-box" id="sol-hw2a"><strong>Solution:</strong> Up to Right is a 90 degree turn.</div>
+
+        <div id="part-hw2b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> Direction?</p>
+            <button class="btn-outline" id="btn-hw2b-c" onclick="checkChoice('hw2b', 'Clock')">Clockwise</button>
+            <button class="btn-outline" id="btn-hw2b-a" onclick="checkChoice('hw2b', 'Anti')">Anticlockwise</button>
+            <div class="feedback" id="fb-hw2b"></div>
+            <div class="solution-box" id="sol-hw2b"><strong>Solution:</strong> Turning Right (like a clock) is Clockwise.</div>
+        </div>
+
+        <div id="part-hw2c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> If we <strong>Reflect</strong> the Up Arrow (Flip vertically), does it point Right?</p>
+            <button class="btn-outline" id="btn-hw2c-n" onclick="checkChoice('hw2c', 'No')">No</button>
+            <button class="btn-outline" id="btn-hw2c-y" onclick="checkChoice('hw2c', 'Yes')">Yes</button>
+            <div class="feedback" id="fb-hw2c"></div>
+            <div class="solution-box" id="sol-hw2c"><strong>Solution:</strong> No, flipping Up makes it point Down.</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q3: The 4-Dice Tower</span>
+        <div class="question-text">
+            Four dice are stacked.<br>
+            <strong>Puzzle Rule:</strong> Touching faces sum to 7.<br>
+            <strong>Top Die (Die 1)</strong> shows <strong>2</strong> on top.
+        </div>
+        
+        <p><strong>A:</strong> What is on the bottom of Die 1?</p>
+        <input type="number" id="ans-hw3a" placeholder="#">
+        <button id="btn-hw3a" onclick="checkAnswer('hw3', 5, 'a')">Check</button>
+        <div class="feedback" id="fb-hw3a"></div>
+        <div class="solution-box" id="sol-hw3a"><strong>Solution:</strong> $7 - 2 = 5$.</div>
+
+        <div id="part-hw3b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> What is on the top of Die 2 (Underneath Die 1)?</p>
+            <input type="number" id="ans-hw3b" placeholder="#">
+            <button id="btn-hw3b" onclick="checkAnswer('hw3', 2, 'b')">Check</button>
+            <div class="feedback" id="fb-hw3b"></div>
+            <div class="solution-box" id="sol-hw3b"><strong>Solution:</strong> Touching faces sum to 7. $7 - 5 = 2$.</div>
+        </div>
+
+        <div id="part-hw3c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> What is on the bottom of the very bottom die (Die 4)?</p>
+            <p><em>(Hint: Follow the pattern 2-5-2-5...)</em></p>
+            <input type="number" id="ans-hw3c" placeholder="#">
+            <button id="btn-hw3c" onclick="checkAnswer('hw3', 5, 'c')">Check</button>
+            <div class="feedback" id="fb-hw3c"></div>
+            <div class="solution-box" id="sol-hw3c"><strong>Solution:</strong> Top is 2. Bottom of 1 is 5. Top of 2 is 2. Bottom of 2 is 5... Bottom of 4 will be 5.</div>
+        </div>
+    </div>
+
+    <div class="hw-item">
+        <span class="hw-label">HW Q4: Complex Structure</span>
+        <div class="graph-container">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+                <rect x="50" y="80" width="30" height="30" fill="#3498db" stroke="black"/> <rect x="80" y="80" width="30" height="30" fill="#3498db" stroke="black"/> <rect x="110" y="80" width="30" height="30" fill="#3498db" stroke="black"/> <rect x="80" y="50" width="30" height="30" fill="#e74c3c" stroke="black"/> </svg>
+        </div>
+        <p><strong>A:</strong> Total blocks?</p>
+        <input type="number" id="ans-hw4a" placeholder="#">
+        <button id="btn-hw4a" onclick="checkAnswer('hw4', 4, 'a')">Check</button>
+        <div class="feedback" id="fb-hw4a"></div>
+        <div class="solution-box" id="sol-hw4a"><strong>Solution:</strong> 3 on bottom + 1 on top = 4.</div>
+
+        <div id="part-hw4b" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>B:</strong> Height of the middle column?</p>
+            <input type="number" id="ans-hw4b" placeholder="#">
+            <button id="btn-hw4b" onclick="checkAnswer('hw4', 2, 'b')">Check</button>
+            <div class="feedback" id="fb-hw4b"></div>
+            <div class="solution-box" id="sol-hw4b"><strong>Solution:</strong> 1 blue + 1 red = 2 blocks high.</div>
+        </div>
+
+        <div id="part-hw4c" style="display:none; margin-top:10px; border-top:1px dashed #ccc;">
+            <p><strong>C:</strong> Looking from the Top, how many squares do you see?</p>
+            <input type="number" id="ans-hw4c" placeholder="#">
+            <button id="btn-hw4c" onclick="checkAnswer('hw4', 3, 'c')">Check</button>
+            <div class="feedback" id="fb-hw4c"></div>
+            <div class="solution-box" id="sol-hw4c"><strong>Solution:</strong> You see 3 columns width.</div>
+        </div>
+    </div>
+
+    <div style="margin-top:30px; text-align:center;">
+        <button onclick="generateReport()" style="background:#f1c40f; color:#2c3e50; font-weight:bold; border:2px solid #2c3e50;">GENERATE MY REPORT 📸</button>
+    </div>
+    
+    <div id="final-report" class="report-card">
+        <div class="report-title">PART 5: SPATIAL REPORT</div>
+        <div class="skill-row"><span class="skill-name">Views & Nets (Q1, Q4)</span><span id="score-views">0/6</span></div>
+        <div class="skill-row"><span class="skill-name">Transformations (Q2)</span><span id="score-trans">0/3</span></div>
+        <div class="skill-row"><span class="skill-name">Logic (Q3)</span><span id="score-logic">0/3</span></div>
+        <div class="final-score" id="total-score">0 / 12</div>
+        <div id="teacher-feedback" style="text-align:center; font-weight:bold; color: #fff;"></div>
+        <div class="teacher-note">Take a screenshot of this box and send it to your teacher.</div>
+    </div>
+</div>
+
+<div class="nav-buttons">
+    <button class="btn-outline" id="prev-btn" onclick="moveCard(-1)" style="display:none;">Previous</button>
+    <button id="next-btn" onclick="moveCard(1)" style="display:none;">Next Question</button>
+</div>
+
+<script>
+    let currentCard = 0;
+    const totalCards = 6; // Cards 0 to 5
+    
+    let attempts = {};
+    let hwScores = {
+        'hw1a':0,'hw1b':0,'hw1c':0,
+        'hw2a':0,'hw2b':0,'hw2c':0,
+        'hw3a':0,'hw3b':0,'hw3c':0,
+        'hw4a':0,'hw4b':0,'hw4c':0
+    };
+
+    function moveCard(direction) {
+        document.getElementById(`card-${currentCard}`).classList.remove('active');
+        currentCard += direction;
+        
+        if(currentCard >= totalCards) currentCard = totalCards - 1;
+        if(currentCard < 0) currentCard = 0;
+
+        document.getElementById(`card-${currentCard}`).classList.add('active');
+        
+        const pct = (currentCard / (totalCards - 1)) * 100;
+        document.getElementById('progress').style.width = pct + '%';
+
+        document.getElementById('prev-btn').style.display = currentCard > 0 ? 'block' : 'none';
+        document.getElementById('next-btn').style.display = 'none';
+    }
+
+    function nextCard(cardNum) {
+        moveCard(cardNum - currentCard);
+    }
+
+    function checkAnswer(id, correctVal, part = null) {
+        let key = part ? `${id}${part}` : `${id}`;
+        let inputId = `ans-${key}`;
+        let btnId = `btn-${key}`;
+        let fbId = `fb-${key}`;
+        let solId = `sol-${key}`;
+        
+        let valRaw = document.getElementById(inputId).value.replace(/,/g, '').trim();
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        let btn = document.getElementById(btnId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        let isCorrect = (Math.abs(parseFloat(valRaw) - correctVal) < 0.1);
+
+        if (isCorrect) {
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "none";
+            if(btn) btn.disabled = true; // Lock
+            
+            if (id.toString().startsWith('hw')) {
+                hwScores[key] = 1;
+                handleHWNext(id, part);
+            } else {
+                handleNext(id, part);
+            }
+        } else {
+            handleWrong(key, feedback, solution, id, part, btn);
+        }
+    }
+
+    function checkChoice(key, correctChoice) {
+        let fbId = `fb-${key}`;
+        let solId = `sol-${key}`;
+        let feedback = document.getElementById(fbId);
+        let solution = document.getElementById(solId);
+        
+        attempts[key] = (attempts[key] || 0) + 1;
+
+        let isRight = false;
+        // Hardcoded Logic for all choice questions
+        if(key === '2a' && correctChoice === 'A') isRight = true;
+        if(key === '2b' && correctChoice === 'Bottom') isRight = true;
+        if(key === '3a' && correctChoice === 'Reflect') isRight = true;
+        if(key === '3b' && correctChoice === 'Rotate') isRight = true;
+        if(key === '3c' && correctChoice === 'No') isRight = true; // 3C changed to No
+        
+        if(key === 'hw1a' && correctChoice === 'Yes') isRight = true;
+        if(key === 'hw1b' && correctChoice === 'Bottom') isRight = true;
+        if(key === 'hw2a' && correctChoice === '90') isRight = true;
+        if(key === 'hw2b' && correctChoice === 'Clock') isRight = true;
+        if(key === 'hw2c' && correctChoice === 'No') isRight = true;
+
+        if (isRight) {
+            feedback.innerHTML = "✅ Correct!";
+            feedback.className = "feedback correct";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "none";
+            disableButtons(key);
+            
+            if (key.startsWith('hw')) {
+                // Parse HW ID
+                let id = key.substring(0,3); // hw1
+                let part = key.substring(3); // a
+                hwScores[key] = 1;
+                handleHWNext(id, part);
+            } else {
+                let id = key.substring(0,1);
+                let part = key.substring(1);
+                handleNext(id, part);
+            }
+        } else {
+            if (attempts[key] < 3) {
+                feedback.innerHTML = "❌ Incorrect.";
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+            } else {
+                feedback.innerHTML = "❌ 3 Attempts used. See solution.";
+                feedback.className = "feedback wrong";
+                feedback.style.display = "block";
+                if(solution) solution.style.display = "block";
+                disableButtons(key);
+                
+                if (key.startsWith('hw')) {
+                    hwScores[key] = 0;
+                    let id = key.substring(0,3); 
+                    let part = key.substring(3);
+                    handleHWNext(id, part);
+                } else {
+                    let id = key.substring(0,1);
+                    let part = key.substring(1);
+                    handleNext(id, part);
+                }
+            }
+        }
+    }
+
+    function disableButtons(key) {
+        // Find all buttons related to this key
+        // Naming convention btn-key-choice
+        let buttons = document.querySelectorAll(`button[id^='btn-${key}']`);
+        buttons.forEach(btn => btn.disabled = true);
+    }
+
+    function handleWrong(key, feedback, solution, id, part, btn) {
+        if (attempts[key] < 3) {
+            feedback.innerHTML = `❌ Try again (${attempts[key]}/3).`;
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+        } else {
+            feedback.innerHTML = "❌ 3 Attempts used. See solution.";
+            feedback.className = "feedback wrong";
+            feedback.style.display = "block";
+            if(solution) solution.style.display = "block";
+            if(btn) btn.disabled = true;
+            
+            if (id.toString().startsWith('hw')) {
+                hwScores[key] = 0;
+                handleHWNext(id, part);
+            }
+            else handleNext(id, part);
+        }
+    }
+
+    function handleNext(id, part) {
+        let sid = id.toString();
+        // Card 1
+        if(sid==='1' && part==='a') document.getElementById('part-b-1').style.display = 'block';
+        else if(sid==='1' && part==='b') document.getElementById('part-c-1').style.display = 'block';
+        else if(sid==='1' && part==='c') document.getElementById('next-btn').style.display = 'block';
+        
+        // Card 2
+        else if(sid==='2' && part==='a') document.getElementById('part-b-2').style.display = 'block';
+        else if(sid==='2' && part==='b') document.getElementById('part-c-2').style.display = 'block';
+        else if(sid==='2' && part==='c') document.getElementById('next-btn').style.display = 'block';
+        
+        // Card 3
+        else if(sid==='3' && part==='a') document.getElementById('part-b-3').style.display = 'block';
+        else if(sid==='3' && part==='b') document.getElementById('part-c-3').style.display = 'block';
+        else if(sid==='3' && part==='c') document.getElementById('next-btn').style.display = 'block';
+        
+        // Card 4
+        else if(sid==='4' && part==='a') document.getElementById('part-b-4').style.display = 'block';
+        else if(sid==='4' && part==='b') document.getElementById('part-c-4').style.display = 'block';
+        else if(sid==='4' && part==='c') document.getElementById('next-btn').style.display = 'block';
+    }
+
+    function handleHWNext(id, part) {
+        if(part === 'a') document.getElementById(`part-${id}b`).style.display = 'block';
+        else if(part === 'b') document.getElementById(`part-${id}c`).style.display = 'block';
+    }
+
+    function generateReport() {
+        let v = hwScores['hw1a'] + hwScores['hw1b'] + hwScores['hw1c'] + 
+                hwScores['hw4a'] + hwScores['hw4b'] + hwScores['hw4c'];
+        
+        let t = hwScores['hw2a'] + hwScores['hw2b'] + hwScores['hw2c'];
+        
+        let l = hwScores['hw3a'] + hwScores['hw3b'] + hwScores['hw3c'];
+        
+        let total = v + t + l;
+
+        document.getElementById('score-views').innerText = v + "/6";
+        document.getElementById('score-trans').innerText = t + "/3";
+        document.getElementById('score-logic').innerText = l + "/3";
+        document.getElementById('total-score').innerText = total + " / 12";
+
+        let msg = "";
+        if (total === 12) msg = "🌟 Spatial Master! Perfect Score.";
+        else if (total >= 8) msg = "👍 Good work. Keep practicing visuals.";
+        else msg = "⚠️ Review your nets and rotations.";
+        
+        document.getElementById('teacher-feedback').innerText = msg;
+        document.getElementById('final-report').style.display = 'block';
+        document.getElementById('final-report').scrollIntoView({behavior: "smooth"});
+    }
+</script>
+
+</body>
+</html>
