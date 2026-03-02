@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAA Numeracy Training Hub</title>
+    
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --success: #27ae60;
+            --error: #c0392b;
+            --bg: #f4f6f7;
+            --card-bg: #ffffff;
+            --text-muted: #7f8c8d;
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: var(--bg); 
+            color: var(--primary); 
+            padding: 30px 20px; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            line-height: 1.6;
+        }
+
+        .header { 
+            text-align: center; 
+            margin-bottom: 50px; 
+            padding-bottom: 20px;
+        }
+
+        .header h1 { 
+            font-size: 2.8em; 
+            margin-bottom: 10px; 
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        .header p {
+            color: var(--text-muted);
+            font-size: 1.2em;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--primary);
+            display: flex;
+            flex-direction: column;
+            border-top: 6px solid;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.08);
+        }
+
+        .card-1 { border-top-color: #e67e22; } 
+        .card-2 { border-top-color: #8e44ad; } 
+        .card-3 { border-top-color: #2980b9; } 
+        .card-4 { border-top-color: #d35400; } 
+        .card-5 { border-top-color: #9b59b6; } 
+
+        .module-card .session-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--bg);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+        }
+
+        .module-card h2 {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+            line-height: 1.2;
+        }
+
+        .module-card p {
+            color: var(--text-muted);
+            flex-grow: 1;
+            font-size: 0.95em;
+            margin: 0;
+        }
+
+        .module-card .action-text {
+            margin-top: 25px;
+            font-weight: 700;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-1 .action-text { color: #e67e22; }
+        .card-2 .action-text { color: #8e44ad; }
+        .card-3 .action-text { color: #2980b9; }
+        .card-4 .action-text { color: #d35400; }
+        .card-5 .action-text { color: #9b59b6; }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .footer-branding {
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-size: 0.9em;
+        }
+
+        .footer-sub {
+            color: var(--text-muted);
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>CAA Numeracy Training</h1>
+        <p>Complete the 5 modules below to master the core skills required for the NCEA co-requisite.</p>
+    </div>
+
+    <div class="module-grid">
+        
+        <a href="caa_part1_proportional.html" class="module-card card-1">
+            <span class="session-badge">PART 1</span>
+            <h2>Proportional Reasoning</h2>
+            <p>Master fractions, percentages, rates, and ratios to solve real-world comparative problems.</p>
+            <div class="action-text">Start Module &rarr;</div>
+        </a>
+
+        <a href="caa_part2_measurement.html" class="module-card card-2">
+            <span class="session-badge">PART 2</span>
+            <h2>Measurement & Geometry</h2>
+            <p>Tackle unit conversions, area, volume, and time calculations across different contexts.</p>
+            <div class="action-text">Start Module &rarr;</div>
+        </a>
+
+        <a href="caa_part3_numberFinance.html" class="module-card card-3">
+            <span class="session-badge">PART 3</span>
+            <h2>Financial Literacy</h2>
+            <p>Understand interest rates, budgeting, taxes, and the true value of money.</p>
+            <div class="action-text">Start Module &rarr;</div>
+        </a>
+
+        <a href="caa_part4_readingGraph.html" class="module-card card-4">
+            <span class="session-badge">PART 4</span>
+            <h2>Interpreting Data</h2>
+            <p>Analyze trends, frequency tables, and spatial data to extract meaningful conclusions.</p>
+            <div class="action-text">Start Module &rarr;</div>
+        </a>
+
+        <a href="caa_part5_spatial.html" class="module-card card-5">
+            <span class="session-badge">PART 5</span>
+            <h2>Spatial Reasoning</h2>
+            <p>Visualize 3D objects, understand transformations, and apply spatial logic to mapping.</p>
+            <div class="action-text">Start Module &rarr;</div>
+        </a>
+
+    </div>
+
+    <div class="footer">
+        <div class="footer-branding">Designed by Mr. Shen</div>
+        <div class="footer-sub">Interactive NCEA Co-requisite Modules</div>
+    </div>
+
+</body>
+</html>
